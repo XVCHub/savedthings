@@ -1,0 +1,2661 @@
+local ColorPalette = {
+    Cor_Hub = Color3.fromRGB(0, 0, 0), 
+    Cor_Options = Color3.fromRGB(0, 0, 0), 
+    Cor_Stroke = Color3.fromRGB(57, 57, 57), 
+    Cor_Text = Color3.fromRGB(255, 255, 255), 
+    Cor_DarkText = Color3.fromRGB(255, 255, 255), 
+    Corner_Radius = UDim.new(0, 23), 
+    Text_Font = Enum.Font.SourceSansBold
+};
+local EmptyTable = {};
+local function PlaySound() --[[ Line: 0 ]] --[[ Name:  ]]
+    local SoundId = "rbxassetid://6324790483";
+    local SoundName = "hubSo100";
+    local WorkspaceChild = workspace:FindFirstChild(SoundName);
+    if WorkspaceChild then
+        WorkspaceChild:Play();
+        return;
+    else
+        local SoundInstance = Instance.new("Sound");
+        SoundInstance.Name = SoundName;
+        SoundInstance.SoundId = SoundId;
+        SoundInstance.Volume = 1;
+        SoundInstance.Parent = workspace;
+        SoundInstance:Play();
+        SoundInstance.Ended:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: l_Sound_0 (ref)
+            SoundInstance:Destroy();
+        end);
+        return;
+    end;
+end;
+local CoreGuiService = game:GetService("CoreGui");
+local TweenService = game:GetService("TweenService");
+local UserInputService = game:GetService("UserInputService");
+local function CreateInstance(InstanceType, ParentInstance, Properties) --[[ Line: 0 ]] --[[ Name:  ]]
+    local NewInstance = Instance.new(InstanceType, ParentInstance);
+    if Properties then
+        table.foreach(Properties, function(PropertyName, PropertyValue) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v13 (ref)
+            NewInstance[PropertyName] = PropertyValue;
+        end);
+    end;
+    return NewInstance;
+end;
+local function MergeTables(TargetTable, SourceTable) --[[ Line: 0 ]] --[[ Name:  ]]
+    if TargetTable and SourceTable then
+        table.foreach(SourceTable, function(Key, Value) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v17 (ref)
+            TargetTable[Key] = Value;
+        end);
+    end;
+    return TargetTable;
+end;
+local function CreateUICorner(Parent, Options) --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v16 (ref), v0 (ref), v21 (ref)
+    local UICorner = CreateInstance("UICorner", Parent);
+    UICorner.CornerRadius = ColorPalette.Corner_Radius;
+    if Options then
+        MergeTables(UICorner, Options);
+    end;
+    return UICorner;
+end;
+local function CreateUIStroke(UIStrokeParent, UIStrokeOptions) --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v16 (ref), v0 (ref), v21 (ref)
+    local UIStroke = CreateInstance("UIStroke", UIStrokeParent);
+    UIStroke.Color = ColorPalette.Cor_Stroke;
+    UIStroke.ApplyStrokeMode = "Border";
+    if UIStrokeOptions then
+        MergeTables(UIStroke, UIStrokeOptions);
+    end;
+    return UIStroke;
+end;
+local function CreateTween(TweenInfoParent, PropertyName1, PropertyValue1, Time, EasingStyle) --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: l_TweenService_0 (ref)
+    local Tween = TweenService:Create(TweenInfoParent, TweenInfo.new(Time, Enum.EasingStyle.Linear), {
+        [PropertyName1] = PropertyValue1
+    });
+    Tween:Play();
+    if EasingStyle then
+        Tween.Completed:Wait();
+    end;
+end;
+RegisterElement = function(Param1, Param2, Param3, Param4, Param5) --[[ Line: 0 ]] --[[ Name:  ]]
+    ConfigManager.SavedElements[Param1] = {
+        Type = Param2, 
+        Name = Param3, 
+        GetValue = Param4, 
+        SetValue = Param5
+    };
+end;
+UpdateExternalElements = function() --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v1 (ref), v36 (ref), v0 (ref)
+    for Index, LoopIndex in pairs(EmptyTable) do
+        if LoopIndex.button and LoopIndex.stroke then
+            CreateTween(LoopIndex.button, "BackgroundColor3", ColorPalette.Cor_Hub, 0.5, false);
+            CreateTween(LoopIndex.stroke, "Color", ColorPalette.Cor_Stroke, 0.5, false);
+        end;
+    end;
+end;
+RegisterExternalElement = function(FuncParam1, FuncParam2) --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v1 (ref)
+    table.insert(EmptyTable, {
+        button = FuncParam1, 
+        stroke = FuncParam2
+    });
+end;
+local function CreateScreenGui(Param) --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v36 (ref), v0 (ref)
+    Param.MouseEnter:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v36 (ref), v46 (ref)
+        CreateTween(Param, "TextColor3", Color3.fromRGB(255, 255, 255), 0.4, true);
+    end);
+    Param.MouseLeave:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v36 (ref), v46 (ref), v0 (ref)
+        CreateTween(Param, "TextColor3", ColorPalette.Cor_Text, 0.4, false);
+    end);
+end;
+local ScreenGui = CreateInstance("ScreenGui", CoreGuiService, {
+    Name = "XHUB"
+});
+ScreenFind = CoreGuiService:FindFirstChild(ScreenGui.Name);
+if ScreenFind and ScreenFind ~= ScreenGui then
+    ScreenFind:Destroy();
+end;
+DestroyScript = function() --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v48 (ref)
+    ScreenGui:Destroy();
+end;
+local MainFrame = CreateInstance("Frame", ScreenGui, {
+    Size = UDim2.new(0, 300, 1, 0), 
+    Position = UDim2.new(1, 0, 0, 0), 
+    AnchorPoint = Vector2.new(1, 0), 
+    BackgroundTransparency = 1
+});
+local Index = CreateInstance("UIPadding", MainFrame, {
+    PaddingLeft = UDim.new(0, 25), 
+    PaddingTop = UDim.new(0, 25), 
+    PaddingBottom = UDim.new(0, 50)
+});
+local UIListLayout = CreateInstance("UIListLayout", MainFrame, {
+    Padding = UDim.new(0, 15), 
+    VerticalAlignment = "Bottom"
+});
+MakeNotifi = function(Notification) --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v16 (ref), v49 (ref), v0 (ref), v25 (ref), v36 (ref)
+    local Title = Notification.Title or "h HUB";
+    local Text = Notification.Text or "n";
+    local Time = Notification.Time or 5;
+    local Frame = CreateInstance("Frame", MainFrame, {
+        Size = UDim2.new(2, 0, 0, 0), 
+        BackgroundTransparency = 1, 
+        AutomaticSize = "Y", 
+        Name = "Title"
+    });
+    local InnerFrame = CreateInstance("Frame", Frame, {
+        Size = UDim2.new(0, MainFrame.Size.X.Offset - 50, 0, 0), 
+        BackgroundColor3 = ColorPalette.Cor_Stroke, 
+        Position = UDim2.new(0, MainFrame.Size.X.Offset, 0, 0), 
+        AutomaticSize = "Y"
+    });
+    CreateUICorner(InnerFrame);
+    local UIStroke = Instance.new("UIStroke", InnerFrame);
+    UIStroke.Thickness = 5;
+    UIStroke.Color = ColorPalette.Cor_Stroke;
+    UIStroke.Transparency = 0.3;
+    local TweenInfo = TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true);
+    game:GetService("TweenService"):Create(UIStroke, TweenInfo, {
+        Transparency = 1
+    }):Play();
+    local TextLabel = CreateInstance("TextLabel", InnerFrame, {
+        Size = UDim2.new(1, 0, 0, 25), 
+        Font = ColorPalette.Text_Font, 
+        BackgroundTransparency = 1, 
+        Text = Title, 
+        TextSize = 20, 
+        Position = UDim2.new(0, 20, 0, 5), 
+        TextXAlignment = "Left", 
+        TextColor3 = ColorPalette.Cor_Text
+    });
+    local TextButton = CreateInstance("TextButton", InnerFrame, {
+        Text = "X", 
+        Font = ColorPalette.Text_Font, 
+        TextSize = 20, 
+        BackgroundTransparency = 1, 
+        TextColor3 = Color3.fromRGB(200, 200, 200), 
+        Position = UDim2.new(1, -5, 0, 5), 
+        AnchorPoint = Vector2.new(1, 0), 
+        Size = UDim2.new(0, 25, 0, 25)
+    });
+    local DescriptionLabel = CreateInstance("TextLabel", InnerFrame, {
+        Size = UDim2.new(1, -30, 0, 0), 
+        Position = UDim2.new(0, 20, 0, TextButton.Size.Y.Offset + 10), 
+        TextSize = 15, 
+        TextColor3 = ColorPalette.Cor_DarkText, 
+        TextXAlignment = "Left", 
+        TextYAlignment = "Top", 
+        AutomaticSize = "Y", 
+        Text = Text, 
+        Font = ColorPalette.Text_Font, 
+        BackgroundTransparency = 1, 
+        AutomaticSize = Enum.AutomaticSize.Y, 
+        TextWrapped = true
+    });
+    local Separator = CreateInstance("Frame", InnerFrame, {
+        Size = UDim2.new(1, 0, 0, 2), 
+        BackgroundColor3 = ColorPalette.Cor_Stroke, 
+        Position = UDim2.new(0, 2, 0, 30), 
+        BorderSizePixel = 0
+    });
+    CreateUICorner(Separator);
+    CreateInstance("Frame", InnerFrame, {
+        Size = UDim2.new(0, 0, 0, 5), 
+        Position = UDim2.new(0, 0, 1, 5), 
+        BackgroundTransparency = 1
+    });
+    task.spawn(function() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v36 (ref), v63 (ref), v55 (ref)
+        CreateTween(Separator, "Size", UDim2.new(0, 0, 0, 2), Time, true);
+    end);
+    TextButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v36 (ref), v57 (ref), v49 (ref), v56 (ref)
+        CreateTween(InnerFrame, "Position", UDim2.new(0, -20, 0, 0), 0.1, true);
+        CreateTween(InnerFrame, "Position", UDim2.new(0, MainFrame.Size.X.Offset, 0, 0), 0.5, true);
+        Frame:Destroy();
+    end);
+    task.spawn(function() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v36 (ref), v57 (ref), v55 (ref), v49 (ref), v56 (ref)
+        CreateTween(InnerFrame, "Position", UDim2.new(0, -20, 0, 0), 0.5, true);
+        CreateTween(InnerFrame, "Position", UDim2.new(), 0.1, true);
+        task.wait(Time);
+        if InnerFrame then
+            CreateTween(InnerFrame, "Position", UDim2.new(0, -20, 0, 0), 0.1, true);
+            CreateTween(InnerFrame, "Position", UDim2.new(0, MainFrame.Size.X.Offset, 0, 0), 0.5, true);
+            Frame:Destroy();
+        end;
+    end);
+end;
+local Width = 500;
+local Height = 270;
+local WidthValue = Width;
+local HeightValue = Height;
+local Size = 300;
+local LargeSize = 800;
+local MediumSize = 200;
+local SmallSize = 600;
+MakeWindow = function(Hub) --[[ Line: 0 ]] --[[ Name:  ]]
+    -- upvalues: v16 (ref), v48 (ref), l_v64_0 (ref), l_v65_0 (ref), v25 (ref), l_TweenService_0 (ref), v36 (ref), v0 (ref), v29 (ref), v6 (ref), v47 (ref), l_UserInputService_0 (ref), v1 (ref)
+    local HubTitle = Hub.Hub.Title or "Xhub";
+    local BackgroundFrame = CreateInstance("Frame", ScreenGui, {
+        BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
+        BackgroundTransparency = 0.19, 
+        Position = UDim2.new(0.5, -WidthValue / 2, 0.5, -HeightValue / 2), 
+        Size = UDim2.new(0, WidthValue, 0, HeightValue), 
+        Active = true, 
+        Draggable = true
+    });
+    CreateUICorner(BackgroundFrame);
+    local UIStroke = Instance.new("UIStroke", BackgroundFrame);
+    UIStroke.Thickness = 4;
+    UIStroke.Color = Color3.fromRGB(57, 57, 57);
+    UIStroke.Transparency = 0.1;
+    UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+    local UIGradient = Instance.new("UIGradient", UIStroke);
+    UIGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(57, 57, 57)), 
+        ColorSequenceKeypoint.new(0.25, Color3.fromRGB(120, 120, 120)), 
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)), 
+        ColorSequenceKeypoint.new(0.75, Color3.fromRGB(120, 120, 120)), 
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(57, 57, 57))
+    });
+    UIGradient.Rotation = 0;
+    TweenService:Create(UIGradient, TweenInfo.new(6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, false), {
+        Rotation = 360
+    }):Play();
+    UpdateMenuWidth = function(Param1) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: l_v64_0 (ref), v74 (ref), v36 (ref), l_v65_0 (ref)
+        WidthValue = Param1;
+        if BackgroundFrame then
+            CreateTween(BackgroundFrame, "Size", UDim2.new(0, WidthValue, 0, HeightValue), 0.4, false);
+            CreateTween(BackgroundFrame, "Position", UDim2.new(0.5, -WidthValue / 2, 0.5, -HeightValue / 2), 0.4, false);
+            if ScrollBar then
+                ScrollBar.Size = UDim2.new(0, 120, 1, -tonumber(TopBar.Size.Y.Offset + 2));
+            end;
+            if Containers then
+                Containers.Size = UDim2.new(1, -tonumber(ScrollBar.Size.X.Offset + 3), 1, -tonumber(TopBar.Size.Y.Offset + 3));
+            end;
+        end;
+    end;
+    MHu = function(Param2) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: l_v65_0 (ref), v74 (ref), v36 (ref), l_v64_0 (ref)
+        HeightValue = Param2;
+        if BackgroundFrame then
+            CreateTween(BackgroundFrame, "Size", UDim2.new(0, WidthValue, 0, HeightValue), 0.4, false);
+            CreateTween(BackgroundFrame, "Position", UDim2.new(0.5, -WidthValue / 2, 0.5, -HeightValue / 2), 0.4, false);
+            if ScrollBar then
+                ScrollBar.Size = UDim2.new(0, 120, 1, -tonumber(TopBar.Size.Y.Offset + 2));
+            end;
+            if Containers then
+                Containers.Size = UDim2.new(1, -tonumber(ScrollBar.Size.X.Offset + 3), 1, -tonumber(TopBar.Size.Y.Offset + 3));
+            end;
+        end;
+    end;
+    local InnerFrame = CreateInstance("Frame", BackgroundFrame, {
+        BackgroundTransparency = 1, 
+        BackgroundColor3 = ColorPalette.Cor_Stroke, 
+        Size = UDim2.new(1, 0, 0, 25), 
+        Visible = false
+    });
+    local ButtonFrame = CreateInstance("Frame", InnerFrame, {
+        Size = UDim2.new(0, 40, 1, -5), 
+        Position = UDim2.new(1, -10, 0, 2.5), 
+        AnchorPoint = Vector2.new(1, 0), 
+        BackgroundTransparency = 1
+    });
+    local ButtonLabel = CreateInstance("TextLabel", InnerFrame, {
+        Size = UDim2.new(1, 0, 1, 0), 
+        Position = UDim2.new(0, 20, 0, 0), 
+        TextColor3 = ColorPalette.Cor_Text, 
+        Font = ColorPalette.Text_Font, 
+        TextXAlignment = "Left", 
+        Text = HubTitle, 
+        TextSize = 20, 
+        BackgroundTransparency = 1, 
+        BackgroundColor3 = ColorPalette.Cor_Stroke, 
+        RichText = true
+    });
+    local TextButton = CreateInstance("TextButton", ButtonFrame, {
+        Text = "       \195\151", 
+        TextColor3 = ColorPalette.Cor_Text, 
+        Size = UDim2.new(0.5, 0, 1, 0), 
+        BackgroundTransparency = 1, 
+        Font = Enum.Font.FredokaOne, 
+        TextYAlignment = "Bottom", 
+        TextSize = 25
+    });
+    local BooleanValue = false;
+    TextButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v83 (ref), v36 (ref), v74 (ref)
+        BooleanValue = not BooleanValue;
+        if BooleanValue then
+            CreateTween(BackgroundFrame, "Size", UDim2.new(0, 500, 0, 40), 0.15, true);
+        else
+            CreateTween(BackgroundFrame, "Size", UDim2.new(0, 500, 0, 270), 0.15, false);
+        end;
+    end);
+    local TextButton = CreateInstance("TextButton", ButtonFrame, {
+        Text = "\239\191\189\239\191\189", 
+        TextYAlignment = "Bottom", 
+        TextColor3 = ColorPalette.Cor_Text, 
+        Size = UDim2.new(0.5, 0, 1, 0), 
+        AnchorPoint = Vector2.new(1, 0), 
+        Position = UDim2.new(1, 0, 0, 0), 
+        BackgroundTransparency = 1, 
+        Font = ColorPalette.Text_Font, 
+        TextSize = 25
+    });
+    local function CreateNotification() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v83 (ref), v36 (ref), v74 (ref), v16 (ref), v0 (ref), v25 (ref), v29 (ref), v6 (ref)
+        BooleanValue = false;
+        CreateTween(BackgroundFrame, "Size", UDim2.new(0, 500, 0, 270), 0.3, false);
+        local Button = CreateInstance("TextButton", BackgroundFrame, {
+            BackgroundTransparency = 0.4, 
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            AutoButtonColor = false, 
+            Text = "", 
+            Visible = false
+        });
+        CreateUICorner(Button);
+        local ButtonFrame = CreateInstance("Frame", Button, {
+            Size = UDim2.new(), 
+            AnchorPoint = Vector2.new(0.5, 0.5), 
+            Position = UDim2.new(0.5, 0, 0.5, 0), 
+            Transparency = 0.8, 
+            BackgroundColor3 = ColorPalette.Cor_Hub
+        });
+        CreateUICorner(ButtonFrame);
+        CreateUIStroke(ButtonFrame);
+        local Label = CreateInstance("TextLabel", ButtonFrame, {
+            Size = UDim2.new(0.8, 0, 0.2, 0), 
+            Text = "Close The Script? ", 
+            Position = UDim2.new(0.1, 0, 0.2), 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Font = ColorPalette.Text_Font, 
+            TextScaled = true, 
+            BackgroundTransparency = 1
+        });
+        local YesButton = CreateInstance("TextButton", ButtonFrame, {
+            Size = UDim2.new(0.35, 0, 0.3, 0), 
+            Position = UDim2.new(0.1, 0, 0.5, 0), 
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            Text = "\239\191\189\239\191\189", 
+            Font = ColorPalette.Text_Font, 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            TextSize = 40
+        });
+        CreateUICorner(YesButton);
+        CreateUIStroke(YesButton);
+        local NoButton = CreateInstance("TextButton", ButtonFrame, {
+            Size = UDim2.new(0.35, 0, 0.3, 0), 
+            Position = UDim2.new(0.9, 0, 0.5, 0), 
+            AnchorPoint = Vector2.new(1, 0), 
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            Text = "\239\191\189", 
+            Font = ColorPalette.Text_Font, 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            TextSize = 40
+        });
+        CreateUICorner(NoButton);
+        CreateUIStroke(NoButton);
+        local function CreatePrompt() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v74 (ref), v85 (ref)
+            if BackgroundFrame.Size.Y.Offset > 100 then
+                Button.Visible = true;
+            else
+                Button.Visible = false;
+            end;
+        end;
+        CreatePrompt();
+        BackgroundFrame:GetPropertyChangedSignal("Size"):Connect(CreatePrompt);
+        CreateTween(ButtonFrame, "Transparency", 0, 0.2, false);
+        CreateTween(ButtonFrame, "Size", UDim2.new(0.7, 0, 0.7, 0), 0.2, false);
+        NoButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v6 (ref), v36 (ref), v86 (ref), v85 (ref)
+            PlaySound();
+            CreateTween(ButtonFrame, "Transparency", 1, 0.3, false);
+            CreateTween(ButtonFrame, "Size", UDim2.new(), 0.2, true);
+            Button:Destroy();
+        end);
+        YesButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v6 (ref), v85 (ref), v0 (ref), v36 (ref)
+            PlaySound();
+            Button:Destroy();
+            local ScreenGui = Instance.new("ScreenGui", game.CoreGui);
+            ScreenGui.IgnoreGuiInset = true;
+            ScreenGui.ResetOnSpawn = false;
+            local Frame = Instance.new("Frame", ScreenGui);
+            Frame.BackgroundColor3 = Color3.new(0, 0, 0);
+            Frame.Size = UDim2.new(1, 0, 1, 0);
+            Frame.BackgroundTransparency = 1;
+            local Label = Instance.new("TextLabel", Frame);
+            Label.Size = UDim2.new(1, 0, 1, 0);
+            Label.Position = UDim2.new(0, 0, 0, 0);
+            Label.Text = "I HOPE YOU ENJOY!";
+            Label.TextColor3 = Color3.fromRGB(255, 255, 255);
+            Label.Font = ColorPalette.Text_Font;
+            Label.TextScaled = false;
+            Label.TextSize = 27;
+            Label.BackgroundTransparency = 1;
+            Label.TextTransparency = 1;
+            Label.ZIndex = 9999;
+            Label.TextWrapped = true;
+            Label.TextXAlignment = Enum.TextXAlignment.Center;
+            Label.TextYAlignment = Enum.TextYAlignment.Center;
+            CreateTween(Frame, "BackgroundTransparency", 0, 0.5, false);
+            CreateTween(Label, "TextTransparency", 0, 0.5, false);
+            task.delay(2, function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: v36 (ref), v93 (ref), v92 (ref), v91 (ref)
+                CreateTween(Label, "TextTransparency", 1, 0.5, false);
+                CreateTween(Frame, "BackgroundTransparency", 1, 0.5, false);
+                DestroyScript();
+                task.wait(0.7);
+                ScreenGui:Destroy();
+            end);
+        end);
+        Button.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), v86 (ref), v85 (ref)
+            CreateTween(ButtonFrame, "Transparency", 1, 0.3, false);
+            CreateTween(ButtonFrame, "Size", UDim2.new(), 0.2, true);
+            Button:Destroy();
+        end);
+    end;
+    TextButton.MouseButton1Click:Connect(CreateNotification);
+    InnerFrame.Visible = true;
+    BackgroundFrame.Draggable = true;
+    local Frame = CreateInstance("Frame", BackgroundFrame, {
+        BackgroundTransparency = 1, 
+        Size = UDim2.new(1, 0, 1, 0)
+    });
+    local TweenService = game:GetService("TweenService");
+    local NilValue = nil;
+    local TimeValue = 30;
+    local BooleanValue = false;
+    MinimizeButton = function(Param) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v98 (ref), v0 (ref), v97 (ref), v16 (ref), v48 (ref), v99 (ref), v25 (ref), v6 (ref), v74 (ref)
+        local v101 = Param.Image or "rbxthumb://type=Asset&id=124424768259152&w=150&h=150";
+        local v102 = Param.Size or {
+            TimeValue, 
+            TimeValue
+        };
+        local v103 = Param.Color or ColorPalette.Cor_Hub;
+        local v104 = Param.Corner or true;
+        if NilValue then
+            NilValue:Destroy();
+        end;
+        local v105 = CreateInstance("ImageButton", ScreenGui, {
+            Size = UDim2.new(0, v102[1], 0, v102[2]), 
+            Position = UDim2.new(0.18, 0, 0.1, 0), 
+            BackgroundColor3 = v103, 
+            BackgroundTransparency = 1, 
+            Image = v101, 
+            Active = true, 
+            Draggable = BooleanValue
+        });
+        NilValue = v105;
+        if v104 then
+            CreateUICorner(v105);
+        end;
+        local v106 = Instance.new("UIStroke", v105);
+        v106.Thickness = 1;
+        v106.Color = Color3.fromRGB(57, 57, 57);
+        v106.Transparency = 0.1;
+        v106.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        local v107 = Instance.new("UIGradient", v106);
+        v107.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(57, 57, 57)), 
+            ColorSequenceKeypoint.new(0.25, Color3.fromRGB(120, 120, 120)), 
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)), 
+            ColorSequenceKeypoint.new(0.75, Color3.fromRGB(120, 120, 120)), 
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(57, 57, 57))
+        });
+        v107.Rotation = 0;
+        game:GetService("TweenService"):Create(v107, TweenInfo.new(6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, false), {
+            Rotation = 360
+        }):Play();
+        local v108 = false;
+        v105.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v108 (ref), v6 (ref), v74 (ref)
+            if v108 then
+                v108 = false;
+                PlaySound();
+                BackgroundFrame.Visible = true;
+            else
+                PlaySound();
+                v108 = true;
+                BackgroundFrame.Visible = false;
+            end;
+        end);
+        return v105;
+    end;
+    MSU2 = function(v109) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v98 (ref), v97 (ref), v36 (ref)
+        TimeValue = v109;
+        if NilValue then
+            CreateTween(NilValue, "Size", UDim2.new(0, v109, 0, v109), 0.3, false);
+        end;
+    end;
+    MDU3 = function(v110) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v99 (ref), v97 (ref)
+        BooleanValue = v110;
+        if NilValue then
+            NilValue.Draggable = v110;
+            if not v110 then
+
+            end;
+        end;
+    end;
+    local function v115(v111, v112) --[[ Line: 0 ]] --[[ Name:  ]]
+        v111.Text = "";
+        local v113 = 1;
+        local function v114() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v111 (ref), v112 (ref), v113 (ref), v114 (ref)
+            v111.Text = string.sub(v112, 1, v113);
+            v113 = v113 + 1;
+            if v113 <= #v112 then
+                game:GetService("TweenService"):Create(v111, TweenInfo.new(0.05), {
+                    TextTransparency = 0
+                }):Play();
+                delay(0.05, v114);
+            end;
+        end;
+        v114();
+    end;
+    local v116 = CreateInstance("ScrollingFrame", BackgroundFrame, {
+        Size = UDim2.new(0, 120, 1, -tonumber(InnerFrame.Size.Y.Offset + 2)), 
+        Position = UDim2.new(0, 0, 1, 0), 
+        AnchorPoint = Vector2.new(0, 1), 
+        CanvasSize = UDim2.new(), 
+        ScrollingDirection = "Y", 
+        AutomaticCanvasSize = "Y", 
+        BackgroundTransparency = 1, 
+        ScrollBarThickness = 0
+    });
+    CreateInstance("UIPadding", v116, {
+        PaddingLeft = UDim.new(0, 5), 
+        PaddingRight = UDim.new(0, 5), 
+        PaddingTop = UDim.new(0, 5), 
+        PaddingBottom = UDim.new(0, 5)
+    });
+    CreateInstance("UIListLayout", v116, {
+        Padding = UDim.new(0, 5)
+    });
+    local v117 = CreateInstance("Frame", BackgroundFrame, {
+        Size = UDim2.new(1, -tonumber(v116.Size.X.Offset + 3), 1, -tonumber(InnerFrame.Size.Y.Offset + 3)), 
+        AnchorPoint = Vector2.new(1, 1), 
+        Position = UDim2.new(1, 0, 1, 0), 
+        BackgroundTransparency = 1
+    });
+    CreateUICorner(v117);
+    local v118 = Instance.new("UIStroke", v117);
+    v118.Thickness = 3;
+    v118.Color = ColorPalette.Cor_Stroke;
+    v118.Transparency = 0.3;
+    v118.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+    local v119 = CreateInstance("Frame", BackgroundFrame, {
+        Size = UDim2.new(1, 0, 1, 0), 
+        BackgroundTransparency = 1, 
+        Position = UDim2.new(0, 0, 0, 0)
+    });
+    (function(v120) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v119 (ref), v0 (ref)
+        local v121 = CreateInstance("Frame", v119);
+        v121.BackgroundColor3 = ColorPalette.Cor_Stroke;
+        v121.BorderSizePixel = 0;
+        v121.Size = v120.Size;
+        v121.Position = v120.Position;
+        local v122 = Instance.new("UIStroke", v121);
+        v122.Thickness = 1;
+        v122.Color = ColorPalette.Cor_Stroke;
+        v122.Transparency = 1;
+    end)({
+        Size = UDim2.new(0, 0, 0, 0), 
+        Position = UDim2.new(0, 0, 0, InnerFrame.Size.Y.Offset)
+    });
+    local _12 = 15;
+    local l_Cor_Text_0 = ColorPalette.Cor_Text;
+    BackgroundFrame:GetPropertyChangedSignal("Size"):Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v74 (ref), v116 (ref), v117 (ref), v119 (ref)
+        if BackgroundFrame.Size.Y.Offset > 70 then
+            v116.Visible = true;
+            v117.Visible = true;
+            v119.Visible = true;
+        else
+            v116.Visible = false;
+            v117.Visible = false;
+            v119.Visible = false;
+        end;
+    end);
+    MakeTab = function(v125) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v116 (ref), v29 (ref), v36 (ref), l_Cor_Text_0 (ref), v117 (ref), v115 (ref), v6 (ref), v0 (ref)
+        local v126 = v125.Name or "Tab";
+        local v127 = v125.Icon or "rbxassetid://0000000000";
+        local _13 = true;
+        local v129 = CreateInstance("Frame", v116, {
+            Size = UDim2.new(1, 0, 0, 29), 
+            BackgroundTransparency = 1
+        });
+        local l_UICorner_0 = Instance.new("UICorner");
+        l_UICorner_0.CornerRadius = UDim.new(0, 30);
+        l_UICorner_0.Parent = v129;
+        CreateUIStroke(v129);
+        local v131 = CreateInstance("TextButton", v129, {
+            Size = UDim2.new(1, 0, 1, 0), 
+            BackgroundTransparency = 1, 
+            Text = ""
+        });
+        v131.MouseEnter:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), v129 (ref)
+            CreateTween(v129, "BackgroundColor3", Color3.fromRGB(50, 50, 50), 0.2, false);
+        end);
+        v131.MouseLeave:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), v129 (ref)
+            CreateTween(v129, "BackgroundColor3", Color3.fromRGB(45, 45, 45), 0.2, false);
+        end);
+        local _14 = CreateInstance("ImageLabel", v129, {
+            Size = UDim2.new(0, 20, 0, 20), 
+            Position = UDim2.new(0, 5, 0, 5), 
+            BackgroundTransparency = 1, 
+            Image = v127
+        });
+        local v133 = CreateInstance("TextLabel", v129, {
+            Size = UDim2.new(1, 1, 1, 0), 
+            Position = UDim2.new(0, 1, 0, 0), 
+            BackgroundTransparency = 1, 
+            Font = Enum.Font.SourceSans, 
+            TextColor3 = l_Cor_Text_0, 
+            TextSize = 17, 
+            Text = v126
+        });
+        local v134 = CreateInstance("ScrollingFrame", v117, {
+            Size = UDim2.new(1, 0, 1, 0), 
+            ScrollingDirection = "Y", 
+            AutomaticCanvasSize = "Y", 
+            CanvasSize = UDim2.new(), 
+            BackgroundTransparency = 1, 
+            ScrollBarThickness = 0, 
+            Visible = false
+        });
+        CreateInstance("UIPadding", v134, {
+            PaddingLeft = UDim.new(0, 20), 
+            PaddingRight = UDim.new(0, 20), 
+            PaddingTop = UDim.new(0, 20), 
+            PaddingBottom = UDim.new(0, 20)
+        });
+        CreateInstance("UIListLayout", v134, {
+            Padding = UDim.new(0, 6)
+        });
+        v115(v133, v126);
+        v131.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v6 (ref), v117 (ref), v116 (ref), v133 (ref), v36 (ref), v0 (ref), v134 (ref)
+            PlaySound();
+            for Index, v136 in pairs(v117:GetChildren()) do
+                if v136:IsA("ScrollingFrame") then
+                    v136.Visible = false;
+                end;
+            end;
+            for Index, v138 in pairs(v116:GetChildren()) do
+                if v138:IsA("Frame") and v138:FindFirstChild("TextLabel") and v138.TextLabel ~= v133 then
+                    CreateTween(v138.TextLabel, "TextColor3", ColorPalette.Cor_DarkText, 0.3, false);
+                    v138.TextLabel.TextSize = 17;
+                end;
+            end;
+            v134.Visible = true;
+            CreateTween(v133, "TextColor3", ColorPalette.Cor_Text, 0.3, false);
+            v133.TextSize = 17;
+        end);
+        if not FirstTab then
+            v134.Visible = true;
+            CreateTween(v133, "TextColor3", ColorPalette.Cor_Text, 0.3, false);
+            v133.TextSize = 17;
+            FirstTab = true;
+        end;
+        return v134;
+    end;
+    MakeTabV = function(v139) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v116 (ref), v36 (ref), l_Cor_Text_0 (ref), v117 (ref), v115 (ref), v0 (ref)
+        local v140 = v139.Name or "Tab";
+        local v141 = v139.Icon or "rbxassetid://0000000000";
+        local _15 = true;
+        local v143 = CreateInstance("Frame", v116, {
+            Size = UDim2.new(1, 0, 0, 29), 
+            BackgroundTransparency = 1
+        });
+        local l_UICorner_1 = Instance.new("UICorner");
+        l_UICorner_1.CornerRadius = UDim.new(0, 30);
+        l_UICorner_1.Parent = v143;
+        local v145 = Instance.new("UIStroke", v143);
+        v145.Thickness = 1;
+        v145.Color = Color3.fromRGB(255, 255, 0);
+        v145.Transparency = 0.1;
+        v145.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        local v146 = Instance.new("UIGradient", v145);
+        v146.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(57, 57, 57)), 
+            ColorSequenceKeypoint.new(0.25, Color3.fromRGB(120, 120, 120)), 
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)), 
+            ColorSequenceKeypoint.new(0.75, Color3.fromRGB(120, 120, 120)), 
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(57, 57, 57))
+        });
+        v146.Rotation = 0;
+        game:GetService("TweenService"):Create(v146, TweenInfo.new(6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, false), {
+            Rotation = 360
+        }):Play();
+        local v147 = CreateInstance("TextButton", v143, {
+            Size = UDim2.new(1, 0, 1, 0), 
+            BackgroundTransparency = 1, 
+            Text = ""
+        });
+        v147.MouseEnter:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), v143 (ref)
+            CreateTween(v143, "BackgroundColor3", Color3.fromRGB(50, 50, 50), 0.2, false);
+        end);
+        v147.MouseLeave:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), v143 (ref)
+            CreateTween(v143, "BackgroundColor3", Color3.fromRGB(45, 45, 45), 0.2, false);
+        end);
+        local _16 = CreateInstance("ImageLabel", v143, {
+            Size = UDim2.new(0, 20, 0, 20), 
+            Position = UDim2.new(0, 5, 0, 5), 
+            BackgroundTransparency = 1, 
+            Image = v141
+        });
+        local v149 = CreateInstance("TextLabel", v143, {
+            Size = UDim2.new(1, 1, 1, 0), 
+            Position = UDim2.new(0, 1, 0, 0), 
+            BackgroundTransparency = 1, 
+            Font = Enum.Font.SourceSans, 
+            TextColor3 = l_Cor_Text_0, 
+            TextSize = 17, 
+            Text = v140
+        });
+        local v150 = CreateInstance("ScrollingFrame", v117, {
+            Size = UDim2.new(1, 0, 1, 0), 
+            ScrollingDirection = "Y", 
+            AutomaticCanvasSize = "Y", 
+            CanvasSize = UDim2.new(), 
+            BackgroundTransparency = 1, 
+            ScrollBarThickness = 0, 
+            Visible = false
+        });
+        CreateInstance("UIPadding", v150, {
+            PaddingLeft = UDim.new(0, 20), 
+            PaddingRight = UDim.new(0, 20), 
+            PaddingTop = UDim.new(0, 20), 
+            PaddingBottom = UDim.new(0, 20)
+        });
+        CreateInstance("UIListLayout", v150, {
+            Padding = UDim.new(0, 6)
+        });
+        v115(v149, v140);
+        v147.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v117 (ref), v116 (ref), v149 (ref), v36 (ref), v0 (ref), v150 (ref)
+            for Index, v152 in pairs(v117:GetChildren()) do
+                if v152:IsA("ScrollingFrame") then
+                    v152.Visible = false;
+                end;
+            end;
+            for Index, v154 in pairs(v116:GetChildren()) do
+                if v154:IsA("Frame") and v154:FindFirstChild("TextLabel") and v154.TextLabel ~= v149 then
+                    CreateTween(v154.TextLabel, "TextColor3", ColorPalette.Cor_DarkText, 0.3, false);
+                    v154.TextLabel.TextSize = 17;
+                end;
+            end;
+            v150.Visible = true;
+            CreateTween(v149, "TextColor3", ColorPalette.Cor_Text, 0.3, false);
+            v149.TextSize = 17;
+        end);
+        if not FirstTab then
+            v150.Visible = true;
+            CreateTween(v149, "TextColor3", ColorPalette.Cor_Text, 0.3, false);
+            v149.TextSize = 17;
+            FirstTab = true;
+        end;
+        return v150;
+    end;
+    AddWplayer = function(v155, v156) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v25 (ref), v29 (ref)
+        local v157 = v156.LN or "EN";
+        local l_LocalPlayer_0 = game:GetService("Players").LocalPlayer;
+        local v159 = CreateInstance("Frame", v155, {
+            Size = UDim2.new(1, 0, 0, 100), 
+            BackgroundColor3 = Color3.fromRGB(20, 20, 20), 
+            BackgroundTransparency = 9
+        });
+        CreateUICorner(v159);
+        CreateUIStroke(v159);
+        CreateInstance("UIListLayout", v159);
+        CreateInstance("UIPadding", v159, {
+            PaddingLeft = UDim.new(0, 20), 
+            PaddingRight = UDim.new(0, 10), 
+            PaddingTop = UDim.new(0, 5), 
+            PaddingBottom = UDim.new(0, 5)
+        });
+        local v160 = CreateInstance("Frame", v159, {
+            Size = UDim2.new(1, 0, 1, 0), 
+            BackgroundTransparency = 1
+        });
+        local v161 = CreateInstance("ImageLabel", v160, {
+            Size = UDim2.new(0, 60, 0, 60), 
+            Position = UDim2.new(0, 0, 0.5, 0), 
+            AnchorPoint = Vector2.new(0, 0.5), 
+            BackgroundTransparency = 1, 
+            Image = "rbxthumb://type=AvatarHeadShot&id=" .. l_LocalPlayer_0.UserId .. "&w=420&h=420"
+        });
+        CreateUICorner(v161, {
+            CornerRadius = UDim.new(1, 0)
+        });
+        local v162 = v157 == "AR" and "\239\191\189\216\177\216\173\216\168\216\167 " .. l_LocalPlayer_0.DisplayName .. " !" or "Welcome " .. l_LocalPlayer_0.DisplayName .. " !";
+        local _17 = CreateInstance("TextLabel", v160, {
+            Size = UDim2.new(1, -70, 1, 0), 
+            Position = UDim2.new(0, 80, 0.3, 0), 
+            BackgroundTransparency = 1, 
+            Text = v162, 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            Font = Enum.Font.GothamBold, 
+            TextSize = 24, 
+            TextXAlignment = Enum.TextXAlignment.Left, 
+            TextYAlignment = Enum.TextYAlignment.Top, 
+            TextWrapped = true
+        });
+    end;
+    AddButton = function(v164, v165) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref), v36 (ref), v6 (ref), v47 (ref)
+        local v166 = v165.Name or "Button!!";
+        local v167 = v165.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local v168 = CreateInstance("TextButton", v164, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            Text = "", 
+            AutoButtonColor = false, 
+            ClipsDescendants = true
+        });
+        CreateUICorner(v168);
+        local l_UIStroke_0 = Instance.new("UIStroke");
+        l_UIStroke_0.Color = ColorPalette.Cor_Stroke;
+        l_UIStroke_0.Thickness = 1.5;
+        l_UIStroke_0.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        l_UIStroke_0.Parent = v168;
+        local v170 = CreateInstance("TextLabel", v168, {
+            TextSize = 13, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = v166, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            Position = UDim2.new(0, 13, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font, 
+            RichText = true
+        });
+        local v171 = CreateInstance("ImageLabel", v168, {
+            Image = "rbxthumb://type=Asset&id=123946151792818&w=150&h=150", 
+            Size = UDim2.new(0, 20, 0, 20), 
+            Position = UDim2.new(0, 305, 0, 2.5), 
+            BackgroundTransparency = 1, 
+            ImageColor3 = Color3.fromRGB(255, 255, 255)
+        });
+        local function v177(v172, v173) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v0 (ref), v168 (ref), v36 (ref)
+            local l_Frame_0 = Instance.new("Frame");
+            l_Frame_0.Name = "RippleEffect";
+            l_Frame_0.BackgroundColor3 = ColorPalette.Cor_Stroke;
+            l_Frame_0.BackgroundTransparency = 0.7;
+            l_Frame_0.BorderSizePixel = 0;
+            l_Frame_0.AnchorPoint = Vector2.new(0.5, 0.5);
+            l_Frame_0.Position = UDim2.new(0, v172, 0, v173);
+            l_Frame_0.Size = UDim2.new(0, 0, 0, 0);
+            l_Frame_0.ZIndex = 2;
+            local l_UICorner_2 = Instance.new("UICorner");
+            l_UICorner_2.CornerRadius = UDim.new(1, 0);
+            l_UICorner_2.Parent = l_Frame_0;
+            l_Frame_0.Parent = v168;
+            local v176 = UDim2.new(0, v168.AbsoluteSize.X * 2.5, 0, v168.AbsoluteSize.X * 2.5);
+            CreateTween(l_Frame_0, "Size", v176, 0.5, false);
+            CreateTween(l_Frame_0, "BackgroundTransparency", 1, 0.5, false);
+            spawn(function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: l_Frame_0 (ref)
+                wait(0.5);
+                l_Frame_0:Destroy();
+            end);
+        end;
+        v168.MouseEnter:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_0 (ref), v0 (ref)
+            CreateTween(l_UIStroke_0, "Thickness", 2, 0.2, false);
+            CreateTween(l_UIStroke_0, "Color", Color3.fromRGB(math.min(255, ColorPalette.Cor_Stroke.R * 255 * 1.3), math.min(255, ColorPalette.Cor_Stroke.G * 255 * 1.3), math.min(255, ColorPalette.Cor_Stroke.B * 255 * 1.3)), 0.3, false);
+        end);
+        v168.MouseLeave:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_0 (ref), v0 (ref)
+            CreateTween(l_UIStroke_0, "Thickness", 1.5, 0.2, false);
+            CreateTween(l_UIStroke_0, "Color", ColorPalette.Cor_Stroke, 0.3, false);
+        end);
+        v168.MouseButton1Down:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_0 (ref)
+            CreateTween(l_UIStroke_0, "Thickness", 2.5, 0.1, false);
+        end);
+        v168.MouseButton1Up:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_0 (ref)
+            CreateTween(l_UIStroke_0, "Thickness", 2, 0.1, false);
+        end);
+        v168.MouseButton1Click:Connect(function(Index, Index) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v6 (ref), v168 (ref), v177 (ref), v167 (ref), v36 (ref), v171 (ref), v0 (ref)
+            PlaySound();
+            local l_MouseLocation_0 = game:GetService("UserInputService"):GetMouseLocation();
+            local l_AbsolutePosition_0 = v168.AbsolutePosition;
+            local v182 = l_MouseLocation_0.X - l_AbsolutePosition_0.X;
+            local v183 = l_MouseLocation_0.Y - l_AbsolutePosition_0.Y;
+            v177(v182, v183);
+            v167("Click!!");
+            CreateTween(v171, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2, true);
+            CreateTween(v171, "ImageColor3", ColorPalette.Cor_Stroke, 0.2, true);
+            CreateTween(v171, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2, false);
+        end);
+        CreateScreenGui(v170);
+        return {
+            v168, 
+            v170, 
+            l_UIStroke_0
+        };
+    end;
+    AddToggle = function(v184, v185) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v25 (ref), v29 (ref), v0 (ref), v36 (ref)
+        local v186 = v185.Name or "Toggle!!";
+        local v187 = v185.Default or false;
+        local v188 = v185.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local v189 = CreateInstance("TextButton", v184, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255), 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            Text = "", 
+            AutoButtonColor = false
+        });
+        CreateUICorner(v189);
+        CreateUIStroke(v189);
+        local _18 = CreateInstance("TextLabel", v189, {
+            TextSize = 13, 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            Text = v186, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            Position = UDim2.new(0, 13, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font, 
+            RichText = true
+        });
+        local v191 = CreateInstance("Frame", v189, {
+            Size = UDim2.new(0, 30, 0, 15), 
+            Position = UDim2.new(0, 299, 0, 5), 
+            BackgroundTransparency = 1
+        });
+        CreateUICorner(v191, {
+            CornerRadius = UDim.new(2, 0)
+        });
+        local v192 = CreateUIStroke(v191, {
+            Color = Color3.fromRGB(255, 255, 255), 
+            Thickness = 1
+        });
+        local v193 = CreateInstance("Frame", v191, {
+            Size = UDim2.new(0, 13, 0, 13), 
+            Position = UDim2.new(0, 2, 0.5, 0), 
+            AnchorPoint = Vector2.new(0, 0.5), 
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        });
+        CreateUICorner(v193, {
+            CornerRadius = UDim.new(1, 0)
+        });
+        local v194 = false;
+        if v187 then
+            v194 = true;
+            CreateTween(v193, "Position", UDim2.new(0, 15, 0.5, 0), 0.2, false);
+        end;
+        v188(v194);
+        v189.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v193 (ref), v194 (ref), v36 (ref), v188 (ref)
+            if v193.Position.X.Offset < 5 then
+                v194 = true;
+                CreateTween(v193, "Position", UDim2.new(0, 15, 0.5, 0), 0.2, false);
+                v188(true);
+            else
+                v194 = false;
+                CreateTween(v193, "Position", UDim2.new(0, 2, 0.5, 0), 0.2, false);
+                v188(false);
+            end;
+        end);
+        return {
+            v193, 
+            v192, 
+            v194, 
+            v188
+        };
+    end;
+    UpdateToggle = function(v195, v196) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v36 (ref)
+        local v197 = v195[1];
+        local _19 = v195[2];
+        local v199 = v195[4];
+        if v196 then
+            v199(true);
+            CreateTween(v197, "Position", UDim2.new(0, 15, 0.5, 0), 0.2, false);
+        else
+            v199(false);
+            CreateTween(v197, "Position", UDim2.new(0, 2, 0.5, 0), 0.2, false);
+        end;
+    end;
+    AddSlider = function(v200, v201) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref), v29 (ref), v47 (ref), l_UserInputService_0 (ref), v36 (ref)
+        local v202 = v201.Name or "Slider!!";
+        local v203 = v201.Increase or 1;
+        local v204 = v201.MinValue / v203 or 10 / v203;
+        local v205 = v201.MaxValue / v203 or 100 / v203;
+        local v206 = v201.Default or 25;
+        local CallbackFunction = v201.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local ButtonContainer = CreateInstance("TextButton", v200, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            Text = 0
+        });
+        CreateUICorner(ButtonContainer);
+        CreateUIStroke(ButtonContainer);
+        local ButtonText = CreateInstance("TextButton", ButtonContainer, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = v202, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            Position = UDim2.new(0, 150, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font, 
+            RichText = true
+        });
+        CreateScreenGui(ButtonText);
+        local ButtonLabel = CreateInstance("TextLabel", ButtonContainer, {
+            Font = ColorPalette.Text_Font, 
+            Size = UDim2.new(0, 20, 0, 20), 
+            Text = "...", 
+            Position = UDim2.new(0, 5, 0, 2.5), 
+            TextScaled = true, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            BackgroundTransparency = 1, 
+            RichText = true
+        });
+        local TextLabelContainer = CreateInstance("TextLabel", ButtonContainer, {
+            Size = UDim2.new(0, 100, 0, 7.5), 
+            Position = UDim2.new(0, 35, 0.5, 0), 
+            AnchorPoint = Vector2.new(0, 0.5), 
+            BackgroundColor3 = ColorPalette.Cor_Stroke, 
+            Text = ""
+        });
+        CreateUICorner(TextLabelContainer);
+        local SeparatorFrame = CreateInstance("Frame", TextLabelContainer, {
+            Size = UDim2.new(0, 1, 0, 0), 
+            Visible = false
+        });
+        local TextHighlightFrame = CreateInstance("Frame", TextLabelContainer, {
+            BackgroundColor3 = ColorPalette.Cor_Text, 
+            Size = UDim2.new(0, 7.5, 0, 15), 
+            Position = UDim2.new(0, 0, 0.5, 0), 
+            AnchorPoint = Vector2.new(0, 0.5), 
+            Active = true, 
+            Draggable = true
+        });
+        CreateUICorner(TextHighlightFrame);
+        local WhiteFrame = CreateInstance("Frame", TextLabelContainer, {
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255), 
+            Size = UDim2.new(0, TextHighlightFrame.Position.X.Offset, 1, 0)
+        });
+        CreateUICorner(WhiteFrame);
+        local function LocalFunction(ParameterValue) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v203 (ref), v210 (ref), v207 (ref)
+            local CalculatedValue = tostring(ParameterValue * v203);
+            if string.find(CalculatedValue, ".") then
+                CalculatedValue = CalculatedValue:sub(1, 5);
+            end;
+            ButtonLabel.Text = CalculatedValue;
+            CallbackFunction(ParameterValue * v203);
+        end;
+        local FalseValue = false;
+        ButtonContainer.MouseButton1Down:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v218 (ref), l_UserInputService_0 (ref), v212 (ref), v213 (ref)
+            FalseValue = true;
+            while FalseValue do
+                task.wait();
+                local MouseOffset = UserInputService:GetMouseLocation().X - SeparatorFrame.AbsolutePosition.X;
+                TextHighlightFrame.Position = UDim2.new(0, MouseOffset, 0.5, 0);
+            end;
+        end);
+        ButtonContainer.MouseLeave:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v218 (ref)
+            FalseValue = false;
+        end);
+        (function(ParameterValue1) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v205 (ref), v203 (ref), v204 (ref), v36 (ref), v213 (ref)
+            local MultiplierValue = v205 * v203;
+            local DivisorValue = v204 * v203;
+            local ProgressPercentage = (ParameterValue1 - DivisorValue) / (MultiplierValue - DivisorValue) * 100;
+            local ProgressSize = UDim2.new(0, ProgressPercentage + 1, 0, 0);
+            CreateTween(TextHighlightFrame, "Position", ProgressSize, 0.5, false);
+        end)(v206);
+        TextHighlightFrame.Changed:Connect(function(ParameterValue2) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v213 (ref), v214 (ref), v205 (ref), v204 (ref), v217 (ref)
+            if ParameterValue2 == "Position" then
+                TextHighlightFrame.Position = UDim2.new(0, math.clamp(TextHighlightFrame.Position.X.Offset, 0, 100), 0.5, 0);
+                WhiteFrame.Size = UDim2.new(0, TextHighlightFrame.Position.X.Offset, 1, 0);
+                local SliderPercentage = TextHighlightFrame.Position.X.Offset / 100;
+                local SliderValue = math.floor(SliderPercentage * v205 / v205 * (v205 - v204) + v204);
+                LocalFunction(SliderValue);
+            end;
+        end);
+        return {
+            TextHighlightFrame, 
+            v203, 
+            v205, 
+            v204
+        };
+    end;
+    UpdateSlider = function(TableValue, ParameterValue3) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v36 (ref)
+        local TableValue1 = TableValue[1];
+        local TableValue2 = TableValue[2];
+        local TableValue3 = TableValue[3] * TableValue2;
+        local TableValue4 = TableValue[4] * TableValue2;
+        local ProgressPercentage2 = (ParameterValue3 - TableValue4) / (TableValue3 - TableValue4) * 100;
+        local ProgressSize2 = UDim2.new(0, ProgressPercentage2 + 1, 0, 0);
+        CreateTween(TableValue1, "Position", ProgressSize2, 0.5, false);
+    end;
+    AddKeybind = function(ContainerFrame, ConfigTable) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref), v29 (ref), l_UserInputService_0 (ref), v47 (ref)
+        local ConfigName = ConfigTable.Name or "Slider!!";
+        local ConfigKeyCode = ConfigTable.KeyCode or "E";
+        local ConfigDefault = ConfigTable.Default or false;
+        local ConfigCallback = ConfigTable.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local ButtonFrame = CreateInstance("Frame", ContainerFrame, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame"
+        });
+        CreateUICorner(ButtonFrame);
+        CreateUIStroke(ButtonFrame);
+        local ButtonText2 = CreateInstance("TextButton", ButtonFrame, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = ConfigName, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            Position = UDim2.new(0, 35, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font, 
+            RichText = true
+        });
+        local ButtonLabel2 = CreateInstance("TextLabel", ButtonFrame, {
+            Font = ColorPalette.Text_Font, 
+            Size = UDim2.new(0, 18, 0, 18), 
+            Text = ConfigKeyCode, 
+            Position = UDim2.new(0, 5, 0, 3.5), 
+            TextScaled = true, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            BackgroundTransparency = 1
+        });
+        CreateUICorner(ButtonLabel2);
+        CreateUIStroke(ButtonLabel2);
+        local ConfigDefaultValue = ConfigDefault;
+        UserInputService.InputBegan:Connect(function(ParameterValue4) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v239 (ref), l_v240_0 (ref), v241 (ref)
+            if ParameterValue4.KeyCode == Enum.KeyCode[ConfigKeyCode] then
+                ConfigDefaultValue = not ConfigDefaultValue;
+                ConfigCallback(ConfigDefaultValue);
+            end;
+        end);
+        CreateScreenGui(ButtonText2);
+    end;
+    AddTextBox = function(ContainerFrame2, ConfigTable2) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref), v29 (ref), v47 (ref), v36 (ref)
+        local ConfigName2 = ConfigTable2.Name or "TextBox!!";
+        local ConfigDefault2 = ConfigTable2.Default or "TextBox";
+        local ConfigPlaceholder = ConfigTable2.PlaceholderText or "TextBox";
+        local ConfigClearText = ConfigTable2.ClearText or false;
+        local ConfigCallback2 = ConfigTable2.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local FrameContainer = CreateInstance("Frame", ContainerFrame2, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame"
+        });
+        CreateUICorner(FrameContainer);
+        CreateUIStroke(FrameContainer);
+        local ButtonText3 = CreateInstance("TextButton", FrameContainer, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = ConfigName2, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            Position = UDim2.new(0, 150, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font, 
+            RichText = true
+        });
+        CreateScreenGui(ButtonText3);
+        local TextBoxContainer = CreateInstance("TextBox", FrameContainer, {
+            Size = UDim2.new(0, 120, 0, 20), 
+            Position = UDim2.new(0, 15, 0, 2.5), 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = ConfigDefault2, 
+            ClearTextOnFocus = ConfigClearText, 
+            PlaceholderText = ConfigPlaceholder, 
+            TextScaled = true, 
+            Font = ColorPalette.Text_Font, 
+            BackgroundTransparency = 1, 
+            RichText = true
+        });
+        local TextBoxFrame = CreateInstance("Frame", TextBoxContainer, {
+            Size = UDim2.new(1, 0, 0, 1), 
+            Position = UDim2.new(0.5, 0, 1, 0), 
+            AnchorPoint = Vector2.new(0.5, 0.5), 
+            BackgroundColor3 = ColorPalette.Cor_Stroke, 
+            BorderSizePixel = 0
+        });
+        TextBoxContainer.MouseEnter:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), v257 (ref)
+            CreateTween(TextBoxFrame, "Size", UDim2.new(0, 0, 0, 1), 0.3, true);
+            CreateTween(TextBoxFrame, "Size", UDim2.new(1, 0, 0, 1), 0.3, true);
+        end);
+        TextBoxContainer.FocusLost:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v253 (ref), v256 (ref)
+            ConfigCallback2(TextBoxContainer.Text);
+        end);
+    end;
+    AddColorPicker = function(ColorPickerFrame, ColorConfig) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v29 (ref), v25 (ref), l_UserInputService_0 (ref), v36 (ref), l_TweenService_1 (ref)
+        local ColorName = ColorConfig.Name or "Color Picker";
+        local ColorDefault = ColorConfig.Default or Color3.fromRGB(0, 0, 200);
+        local ColorCallback = ColorConfig.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local Value1 = 1;
+        local Value2 = 1;
+        local Value3 = 1;
+        ColorCallback(ColorDefault);
+        local ColorFrame = CreateInstance("Frame", ColorPickerFrame, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options
+        });
+        CreateUIStroke(ColorFrame);
+        CreateUICorner(ColorFrame);
+        local ColorButton = CreateInstance("TextButton", ColorFrame, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundTransparency = 1, 
+            AutoButtonColor = false, 
+            Text = ""
+        });
+        local TextLabelContainer2 = CreateInstance("TextLabel", ColorFrame, {
+            Size = UDim2.new(1, -10, 0, 25), 
+            Position = UDim2.new(0, 35, 0, 0), 
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            TextXAlignment = "Left", 
+            Text = ColorName, 
+            Font = ColorPalette.Text_Font, 
+            BackgroundTransparency = 1
+        });
+        local ColorIndicator = CreateInstance("Frame", ColorFrame, {
+            Size = UDim2.new(0, 20, 0, 20), 
+            Position = UDim2.new(0, 5, 0, 2.5), 
+            BackgroundColor3 = ColorDefault
+        });
+        CreateUICorner(ColorIndicator);
+        CreateUIStroke(ColorIndicator);
+        local ColorPicker = CreateInstance("ImageButton", ColorFrame, {
+            Size = UDim2.new(1, -100, 1, tonumber(-ColorFrame.Size.Y.Offset - 20)), 
+            Position = UDim2.new(0, 10, 0, tonumber(ColorFrame.Size.Y.Offset + 12.5)), 
+            Visible = false, 
+            Image = "rbxassetid://4155801252"
+        });
+        CreateUICorner(ColorPicker);
+        CreateUIStroke(ColorPicker);
+        local ColorPickerFrame2 = CreateInstance("Frame", ColorPicker, {
+            Visible = false
+        });
+        local ColorButton2 = CreateInstance("TextButton", ColorFrame, {
+            Size = UDim2.new(0, 30, 1, tonumber(-ColorFrame.Size.Y.Offset - 20)), 
+            Position = UDim2.new(1, -10, 0, tonumber(ColorFrame.Size.Y.Offset + 12.5)), 
+            AnchorPoint = Vector2.new(1, 0), 
+            Visible = false, 
+            Text = ""
+        });
+        CreateUICorner(ColorButton2);
+        CreateUIStroke(ColorButton2);
+        CreateInstance("UIGradient", ColorButton2, {
+            Rotation = 90, 
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 4)), 
+                ColorSequenceKeypoint.new(0.2, Color3.fromRGB(234, 255, 0)), 
+                ColorSequenceKeypoint.new(0.4, Color3.fromRGB(21, 255, 0)), 
+                ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)), 
+                ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 17, 255)), 
+                ColorSequenceKeypoint.new(0.9, Color3.fromRGB(255, 0, 251)), 
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 4))
+            })
+        });
+        local ColorFrame2 = CreateInstance("Frame", ColorButton2, {
+            Visible = false, 
+            Size = UDim2.new(1, 0, 0, 0)
+        });
+        local ColorContainer = CreateInstance("Frame", ColorFrame, {
+            Size = UDim2.new(1, 0, 0, 0), 
+            Position = UDim2.new(0, 0, 0, 30), 
+            Visible = false
+        });
+        CreateUIStroke(ColorContainer);
+        local ColorFrame3 = CreateInstance("Frame", ColorButton2, {
+            Size = UDim2.new(1, 0, 0, 10), 
+            Position = UDim2.new(0, 0, 0, select(3, Color3.toHSV(ColorDefault))), 
+            BackgroundTransparency = 1, 
+            Active = true, 
+            Draggable = true
+        });
+        CreateUICorner(ColorFrame3, {
+            CornerRadius = UDim.new(2, 0)
+        });
+        CreateUIStroke(ColorFrame3, {
+            Color = Color3.fromRGB(255, 255, 255)
+        });
+        local ColorIndicator2 = CreateInstance("Frame", ColorPicker, {
+            Size = UDim2.new(0, 15, 0, 15), 
+            Position = UDim2.new(0, select(2, Color3.toHSV(ColorDefault)), 0, select(1, Color3.toHSV(ColorDefault))), 
+            BackgroundTransparency = 1, 
+            Active = true, 
+            Draggable = true
+        });
+        CreateUICorner(ColorIndicator2, {
+            CornerRadius = UDim.new(2, 0)
+        });
+        CreateUIStroke(ColorIndicator2, {
+            Color = Color3.fromRGB(255, 255, 255)
+        });
+        ColorPicker.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: l_UserInputService_0 (ref), v271 (ref), v36 (ref), v276 (ref)
+            local MouseLocation = UserInputService:GetMouseLocation();
+            local AbsolutePosition = ColorPickerFrame2.AbsolutePosition;
+            CreateTween(ColorIndicator2, "Position", UDim2.new(0, MouseLocation.X - AbsolutePosition.X, 0, tonumber(MouseLocation.Y - AbsolutePosition.Y) - 35), 0.3, false);
+        end);
+        ColorButton2.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: l_UserInputService_0 (ref), v273 (ref), v36 (ref), v275 (ref)
+            local MouseYOffset = UserInputService:GetMouseLocation().Y - 35;
+            local YPosition = ColorFrame2.AbsolutePosition.Y;
+            CreateTween(ColorFrame3, "Position", UDim2.new(0, 0, 0, MouseYOffset - YPosition), 0.3, false);
+        end);
+        local function LocalFunction2() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v262 (ref), v263 (ref), v264 (ref), v265 (ref)
+            ColorCallback(Color3.fromHSV(Value1, Value2, Value3));
+        end;
+        local function LocalFunction3() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v263 (ref), v275 (ref), v264 (ref), v276 (ref), v265 (ref), v270 (ref), v269 (ref), v281 (ref)
+            Value1 = tonumber(ColorFrame3.Position.Y.Offset) / 80;
+            Value2 = tonumber(215 - ColorIndicator2.Position.X.Offset) / 215;
+            Value3 = tonumber(75 - ColorIndicator2.Position.Y.Offset) / 75;
+            ColorPicker.ImageColor3 = Color3.fromHSV(Value1, 1, 1);
+            ColorIndicator.BackgroundColor3 = Color3.fromHSV(Value1, Value2, Value3);
+            LocalFunction2();
+        end;
+        LocalFunction3();
+        ColorFrame3.Changed:Connect(function(ParameterValue5) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v275 (ref), v282 (ref)
+            if ParameterValue5 == "Position" then
+                ColorFrame3.Position = UDim2.new(0, 0, 0, math.clamp(ColorFrame3.Position.Y.Offset, 0, 80));
+                LocalFunction3();
+            end;
+        end);
+        ColorIndicator2.Changed:Connect(function(ParameterValue6) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v276 (ref), v282 (ref)
+            if ParameterValue6 == "Position" then
+                ColorIndicator2.Position = UDim2.new(0, math.clamp(ColorIndicator2.Position.X.Offset, 0, 222), 0, math.clamp(ColorIndicator2.Position.Y.Offset, 0, 75));
+                LocalFunction3();
+            end;
+        end);
+        ColorFrame.Changed:Connect(function(ParameterValue7) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v266 (ref), v269 (ref), v270 (ref), v274 (ref), v272 (ref)
+            if ParameterValue7 == "Size" then
+                if ColorFrame.Size.Y.Offset >= 60 then
+                    ColorIndicator.Position = UDim2.new(0, 5, 0, 5);
+                    ColorPicker.Visible = true;
+                    ColorContainer.Visible = true;
+                    ColorButton2.Visible = true;
+                else
+                    ColorIndicator.Position = UDim2.new(0, 5, 0, 2.5);
+                    ColorPicker.Visible = false;
+                    ColorContainer.Visible = false;
+                    ColorButton2.Visible = false;
+                end;
+            end;
+        end);
+        local FalseValue2 = false;
+        ColorButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v286 (ref), l_TweenService_1 (ref), v266 (ref)
+            FalseValue2 = not FalseValue2;
+            if FalseValue2 == true then
+                local TweenInfo1 = TweenService:Create(ColorFrame, TweenInfo.new(0.2, Enum.EasingStyle.Linear), {
+                    Size = UDim2.new(1, 0, 0, 140)
+                });
+                TweenInfo1:play();
+                TweenInfo1.Completed:Wait();
+            else
+                local TweenInfo2 = TweenService:Create(ColorFrame, TweenInfo.new(0.2, Enum.EasingStyle.Linear), {
+                    Size = UDim2.new(1, 0, 0, 25)
+                });
+                TweenInfo2:play();
+                TweenInfo2.Completed:Wait();
+            end;
+        end);
+    end;
+    AddDropdown = function(DropdownFrame, DropdownConfig) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref), v29 (ref), v47 (ref), v36 (ref)
+        local DropdownName = DropdownConfig.Name or "Dropdown!!";
+        if not DropdownConfig.Default then
+            local DefaultValue = "TextBox";
+        end;
+        local DropdownOptions = DropdownConfig.Options or {
+            "1", 
+            "2", 
+            "3"
+        };
+        local DropdownDefault = DropdownConfig.Default or "2";
+        local DropdownCallback = DropdownConfig.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local DropdownButton = CreateInstance("TextButton", DropdownFrame, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            Text = "", 
+            AutoButtonColor = false
+        });
+        CreateUICorner(DropdownButton);
+        CreateUIStroke(DropdownButton);
+        local DropdownText = CreateInstance("TextLabel", DropdownButton, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = DropdownName, 
+            Size = UDim2.new(1, 0, 0, 25), 
+            Position = UDim2.new(0, 35, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font
+        });
+        CreateScreenGui(DropdownText);
+        local DropdownFrame2 = CreateInstance("Frame", DropdownButton, {
+            Size = UDim2.new(1, 0, 0, 1), 
+            Position = UDim2.new(0, 0, 0, 25), 
+            BorderSizePixel = 0, 
+            BackgroundColor3 = ColorPalette.Cor_Stroke, 
+            Visible = false
+        });
+        local DropdownIcon = CreateInstance("ImageLabel", DropdownButton, {
+            Image = "rbxassetid://6031090990", 
+            Size = UDim2.new(0, 25, 0, 25), 
+            Position = UDim2.new(0, 5, 0, 0), 
+            BackgroundTransparency = 1
+        });
+        local DropdownLabel = CreateInstance("TextLabel", DropdownButton, {
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            BackgroundTransparency = 9, 
+            Position = UDim2.new(1, -20, 0, 2.5), 
+            AnchorPoint = Vector2.new(1, 0), 
+            Size = UDim2.new(0, 100, 0, 20), 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            TextScaled = true, 
+            Font = ColorPalette.Text_Font, 
+            Text = "..."
+        });
+        CreateUICorner(DropdownLabel);
+        CreateUIStroke(DropdownLabel);
+        local DropdownScrollingFrame = CreateInstance("ScrollingFrame", DropdownButton, {
+            Size = UDim2.new(1, 0, 1, -25), 
+            Position = UDim2.new(0, 0, 0, 25), 
+            CanvasSize = UDim2.new(), 
+            ScrollingDirection = "Y", 
+            AutomaticCanvasSize = "Y", 
+            BackgroundTransparency = 1, 
+            ScrollBarThickness = 0
+        });
+        CreateInstance("UIPadding", DropdownScrollingFrame, {
+            PaddingLeft = UDim.new(0, 10), 
+            PaddingRight = UDim.new(0, 10), 
+            PaddingTop = UDim.new(0, 10), 
+            PaddingBottom = UDim.new(0, 10)
+        });
+        CreateInstance("UIListLayout", DropdownScrollingFrame, {
+            Padding = UDim.new(0, 5)
+        });
+        local function LocalFunction4(ParameterValue8) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v16 (ref), v301 (ref), v0 (ref), v25 (ref), v294 (ref), v300 (ref), v295 (ref)
+            local DropdownItem = CreateInstance("TextButton", DropdownScrollingFrame, {
+                Size = UDim2.new(1, 0, 0, 15), 
+                Text = ParameterValue8, 
+                Font = ColorPalette.Text_Font, 
+                TextSize = 12, 
+                TextColor3 = Color3.fromRGB(180, 180, 180), 
+                BackgroundTransparency = 1, 
+                RichText = true
+            });
+            CreateUICorner(DropdownItem);
+            local EmptyTable = {};
+            local FalseValue3 = false;
+            if ParameterValue8 == DropdownDefault then
+                FalseValue3 = true;
+                DropdownItem.BackgroundTransparency = 0.8;
+                DropdownItem.TextColor3 = ColorPalette.Cor_Text;
+                DropdownLabel.Text = ParameterValue8;
+                DropdownCallback(ParameterValue8);
+            end;
+            DropdownItem.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: v301 (ref), v300 (ref), v302 (ref), v295 (ref), v303 (ref), v0 (ref)
+                for Index, Index in pairs(DropdownScrollingFrame:GetChildren()) do
+                    if Index:IsA("TextButton") then
+                        Index.BackgroundTransparency = 1;
+                        Index.TextColor3 = Color3.fromRGB(180, 180, 180);
+                    end;
+                end;
+                DropdownLabel.Text = ParameterValue8;
+                DropdownCallback(ParameterValue8);
+                DropdownItem.BackgroundTransparency = 0.8;
+                DropdownItem.TextColor3 = ColorPalette.Cor_Text;
+            end);
+        end;
+        for Index, Iterator in pairs(DropdownOptions) do
+            LocalFunction4(Iterator);
+        end;
+        local IsFalse = false;
+        DropdownButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v301 (ref), v311 (ref), v36 (ref), v296 (ref), v299 (ref), v298 (ref)
+            local Count = 25;
+            local Offset = 0;
+            for Index, Counter in pairs(DropdownScrollingFrame:GetChildren()) do
+                if Counter:IsA("TextButton") and Offset < 5 then
+                    Offset = Offset + 1;
+                    Count = Count + tonumber(Counter.Size.Y.Offset + 10);
+                end;
+            end;
+            if not IsFalse then
+                CreateTween(DropdownButton, "Size", UDim2.new(1, 0, 0, Count), 0.3, false);
+                CreateTween(DropdownIcon, "Rotation", 180, 0.3, false);
+                IsFalse = true;
+                DropdownFrame2.Visible = true;
+            else
+                CreateTween(DropdownButton, "Size", UDim2.new(1, 0, 0, 25), 0.3, false);
+                CreateTween(DropdownIcon, "Rotation", 0, 0.3, true);
+                IsFalse = false;
+                DropdownFrame2.Visible = false;
+            end;
+        end);
+        return {
+            DropdownScrollingFrame, 
+            DropdownDefault, 
+            DropdownCallback, 
+            DropdownLabel
+        };
+    end;
+    local function CreateFunction(Parameter) --[[ Line: 0 ]] --[[ Name:  ]]
+        local StatusResult, ResultData = pcall(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v316 (ref)
+            return game:HttpGet(Parameter);
+        end);
+        if StatusResult then
+            local StatusCode, ResultInfo = pcall(function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: l_result_0 (ref)
+                return game:GetService("HttpService"):JSONDecode(ResultData);
+            end);
+            if StatusCode then
+                return ResultInfo;
+            else
+                warn("[ Xhub] Failed to decode JSON from: " .. Parameter);
+                return nil;
+            end;
+        else
+            warn("[ Xhub ] Failed to load data from: " .. Parameter);
+            return nil;
+        end;
+    end;
+    AddDB = function(OptionName, OptionData) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v321 (ref), v16 (ref), v0 (ref), v25 (ref), v29 (ref), v47 (ref), v48 (ref), v36 (ref), v6 (ref)
+        local OptionTitle = OptionData.Name or "Select Background";
+        local OptionDefault = OptionData.Default or "OriginalBG";
+        local OptionUrl = OptionData.GitHubURL or "https://raw.githubusercontent.com/AA7z/Prs/main/Backgrounds.json";
+        local OptionCallback = OptionData.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local FunctionCall = CreateFunction(OptionUrl);
+        local TableData = {};
+        local TableInfo = {};
+        if FunctionCall and FunctionCall.backgrounds then
+            for LoopIndex, LoopCounter in pairs(FunctionCall.backgrounds) do
+                TableData[LoopIndex] = "rbxthumb://type=Asset&id=" .. LoopCounter.id .. "&w=420&h=420";
+                if LoopCounter.type == "transparent" then
+                    TableData[LoopIndex] = "transparent";
+                elseif LoopCounter.type == "none" then
+                    TableData[LoopIndex] = "none";
+                end;
+                table.insert(TableInfo, {
+                    key = LoopIndex, 
+                    name = LoopCounter.name
+                });
+            end;
+        else
+            TableData.OriginalBG = "rbxthumb://type=Asset&id=294720739644&w=420&h=420";
+            TableInfo = {
+                {
+                    key = "OriginalBG", 
+                    name = "Original Background"
+                }
+            };
+        end;
+        local ButtonContainer = CreateInstance("TextButton", OptionName, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            Text = "", 
+            AutoButtonColor = false
+        });
+        CreateUICorner(ButtonContainer);
+        CreateUIStroke(ButtonContainer);
+        local ButtonLabel = CreateInstance("TextLabel", ButtonContainer, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = OptionTitle, 
+            Size = UDim2.new(1, 0, 0, 25), 
+            Position = UDim2.new(0, 35, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font
+        });
+        CreateScreenGui(ButtonLabel);
+        local ButtonFrame = CreateInstance("Frame", ButtonContainer, {
+            Size = UDim2.new(1, 0, 0, 1), 
+            Position = UDim2.new(0, 0, 0, 25), 
+            BorderSizePixel = 0, 
+            BackgroundColor3 = ColorPalette.Cor_Stroke, 
+            Visible = false
+        });
+        local ButtonImage = CreateInstance("ImageLabel", ButtonContainer, {
+            Image = "rbxassetid://6031090990", 
+            Size = UDim2.new(0, 25, 0, 25), 
+            Position = UDim2.new(0, 5, 0, 0), 
+            BackgroundTransparency = 1
+        });
+        local ButtonDescription = CreateInstance("TextLabel", ButtonContainer, {
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            BackgroundTransparency = 9, 
+            Position = UDim2.new(1, -20, 0, 2.5), 
+            AnchorPoint = Vector2.new(1, 0), 
+            Size = UDim2.new(0, 100, 0, 20), 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            TextScaled = true, 
+            Font = ColorPalette.Text_Font, 
+            Text = "..."
+        });
+        CreateUICorner(ButtonDescription);
+        CreateUIStroke(ButtonDescription);
+        local ButtonScroll = CreateInstance("ScrollingFrame", ButtonContainer, {
+            Size = UDim2.new(1, 0, 1, -25), 
+            Position = UDim2.new(0, 0, 0, 25), 
+            CanvasSize = UDim2.new(), 
+            ScrollingDirection = "Y", 
+            AutomaticCanvasSize = "Y", 
+            BackgroundTransparency = 1, 
+            ScrollBarThickness = 0
+        });
+        CreateInstance("UIPadding", ButtonScroll, {
+            PaddingLeft = UDim.new(0, 10), 
+            PaddingRight = UDim.new(0, 10), 
+            PaddingTop = UDim.new(0, 10), 
+            PaddingBottom = UDim.new(0, 10)
+        });
+        CreateInstance("UIListLayout", ButtonScroll, {
+            Padding = UDim.new(0, 5)
+        });
+        local function CreateWidget(WidgetKey) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v329 (ref), v322 (ref), v48 (ref), v36 (ref), v0 (ref), v6 (ref), v327 (ref)
+            local WidgetValue = TableData[WidgetKey];
+            local OptionParent = OptionName;
+            while OptionParent.Parent ~= ScreenGui and OptionParent.Parent ~= nil do
+                OptionParent = OptionParent.Parent;
+            end;
+            if OptionParent.IsA(OptionParent, "Frame") then
+                local OptionChild = OptionParent.FindFirstChild(OptionParent, "BackgroundImage");
+                if not OptionChild then
+                    OptionChild = Instance.new("ImageLabel");
+                    OptionChild.Name = "BackgroundImage";
+                    OptionChild.AnchorPoint = Vector2.new(0.5, 0.5);
+                    OptionChild.Position = UDim2.new(0.5, 0, 0.5, 0);
+                    OptionChild.Size = UDim2.new(1, 0, 1, 0);
+                    OptionChild.BackgroundTransparency = 1;
+                    OptionChild.ZIndex = 0;
+                    local CornerStyle = Instance.new("UICorner");
+                    CornerStyle.CornerRadius = UDim.new(0, 23);
+                    CornerStyle.Parent = OptionChild;
+                    OptionChild.Parent = OptionParent;
+                end;
+                do
+                    local ChildElement = OptionChild;
+                    if WidgetKey == "OriginalBG" then
+                        ChildElement.Image = TableData[WidgetKey];
+                        ChildElement.ScaleType = Enum.ScaleType.Crop;
+                        ChildElement.Visible = true;
+                        ChildElement.ImageTransparency = 0.5;
+                        CreateTween(OptionParent, "BackgroundTransparency", 0, 0.5, false);
+                    elseif WidgetKey == "NoBackground" or WidgetValue == "none" then
+                        CreateTween(ChildElement, "ImageTransparency", 1, 0.5, false);
+                        task.delay(0.5, function() --[[ Line: 0 ]] --[[ Name:  ]]
+                            -- upvalues: l_v342_0 (ref)
+                            ChildElement.Image = "";
+                            ChildElement.Visible = false;
+                        end);
+                        CreateTween(OptionParent, "BackgroundTransparency", 0, 0.5, false);
+                    elseif WidgetKey == "SlightlyTransparent" or WidgetValue == "transparent" then
+                        ChildElement.Image = "";
+                        ChildElement.Visible = true;
+                        ChildElement.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+                        ChildElement.BackgroundTransparency = 0;
+                        CreateTween(ChildElement, "BackgroundTransparency", 0.7, 0.5, false);
+                        CreateTween(OptionParent, "BackgroundTransparency", 0.2, 0.5, false);
+                    else
+                        ChildElement.BackgroundTransparency = 1;
+                        ChildElement.Image = WidgetValue;
+                        ChildElement.ScaleType = Enum.ScaleType.Crop;
+                        ChildElement.Visible = true;
+                        ChildElement.ImageTransparency = 1;
+                        CreateTween(ChildElement, "ImageTransparency", 0.3, 0.5, false);
+                        CreateTween(OptionParent, "BackgroundTransparency", 1.6, 0.5, false);
+                    end;
+                    local FrameContainer = Instance.new("Frame");
+                    FrameContainer.Size = UDim2.new(0, 0, 0, 0);
+                    FrameContainer.Position = UDim2.new(0.5, 0, 0.5, 0);
+                    FrameContainer.AnchorPoint = Vector2.new(0.5, 0.5);
+                    FrameContainer.BackgroundColor3 = ColorPalette.Cor_Stroke;
+                    FrameContainer.BackgroundTransparency = 0.8;
+                    FrameContainer.BorderSizePixel = 0;
+                    FrameContainer.Parent = OptionParent;
+                    local CornerDecorator = Instance.new("UICorner");
+                    CornerDecorator.CornerRadius = UDim.new(1, 0);
+                    CornerDecorator.Parent = FrameContainer;
+                    CreateTween(FrameContainer, "Size", UDim2.new(2, 0, 2, 0), 0.5, false);
+                    CreateTween(FrameContainer, "BackgroundTransparency", 1, 0.5, false);
+                    task.delay(0.5, function() --[[ Line: 0 ]] --[[ Name:  ]]
+                        -- upvalues: l_Frame_1 (ref)
+                        FrameContainer:Destroy();
+                    end);
+                    PlaySound();
+                    OptionCallback(WidgetKey, WidgetValue);
+                end;
+            end;
+        end;
+        local function CreatePanel(PanelParameter) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v16 (ref), v338 (ref), v0 (ref), v25 (ref), v325 (ref), v337 (ref), v347 (ref)
+            local PanelButton = CreateInstance("TextButton", ButtonScroll, {
+                Size = UDim2.new(1, 0, 0, 15), 
+                Text = PanelParameter.name, 
+                Font = ColorPalette.Text_Font, 
+                TextSize = 12, 
+                TextColor3 = Color3.fromRGB(180, 180, 180), 
+                BackgroundTransparency = 1, 
+                RichText = true
+            });
+            CreateUICorner(PanelButton);
+            if PanelParameter.key == OptionDefault then
+                PanelButton.BackgroundTransparency = 0.8;
+                PanelButton.TextColor3 = ColorPalette.Cor_Text;
+                ButtonDescription.Text = PanelParameter.name;
+                CreateWidget(PanelParameter.key);
+            end;
+            PanelButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: v338 (ref), v337 (ref), v348 (ref), v347 (ref), v349 (ref), v0 (ref)
+                for Index, PanelIndex in pairs(ButtonScroll:GetChildren()) do
+                    if PanelIndex:IsA("TextButton") then
+                        PanelIndex.BackgroundTransparency = 1;
+                        PanelIndex.TextColor3 = Color3.fromRGB(180, 180, 180);
+                    end;
+                end;
+                ButtonDescription.Text = PanelParameter.name;
+                CreateWidget(PanelParameter.key);
+                PanelButton.BackgroundTransparency = 0.8;
+                PanelButton.TextColor3 = ColorPalette.Cor_Text;
+            end);
+        end;
+        for Index, PanelIterator in pairs(TableInfo) do
+            CreatePanel(PanelIterator);
+        end;
+        local IsPanelFalse = false;
+        ButtonContainer.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v338 (ref), v355 (ref), v36 (ref), v333 (ref), v336 (ref), v335 (ref)
+            local PanelCount = 25;
+            local PanelOffset = 0;
+            for Index, PanelCounter in pairs(ButtonScroll:GetChildren()) do
+                if PanelCounter:IsA("TextButton") and PanelOffset < 5 then
+                    PanelOffset = PanelOffset + 1;
+                    PanelCount = PanelCount + tonumber(PanelCounter.Size.Y.Offset + 10);
+                end;
+            end;
+            if not IsPanelFalse then
+                CreateTween(ButtonContainer, "Size", UDim2.new(1, 0, 0, PanelCount), 0.3, false);
+                CreateTween(ButtonImage, "Rotation", 180, 0.3, false);
+                IsPanelFalse = true;
+                ButtonFrame.Visible = true;
+            else
+                CreateTween(ButtonContainer, "Size", UDim2.new(1, 0, 0, 25), 0.3, false);
+                CreateTween(ButtonImage, "Rotation", 0, 0.3, true);
+                IsPanelFalse = false;
+                ButtonFrame.Visible = false;
+            end;
+        end);
+        return {
+            ButtonScroll, 
+            OptionDefault, 
+            CreateWidget, 
+            ButtonDescription
+        };
+    end;
+    AddDT = function(ThemeName, ThemeData) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v321 (ref), v16 (ref), v0 (ref), v25 (ref), v29 (ref), v47 (ref), v1 (ref), v36 (ref), v48 (ref), v6 (ref)
+        local ThemeTitle = ThemeData.Name or "Select Theme";
+        local ThemeDefault = ThemeData.Default or "OriginalTE";
+        local ThemeUrl = ThemeData.GitHubURL or "https://raw.githubusercontent.com/AA7z/Prs/main/Themes.json";
+        local ThemeCallback = ThemeData.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local ThemeFunction = CreateFunction(ThemeUrl);
+        local ThemeTable = {};
+        local ThemeInfo = {};
+        if ThemeFunction and ThemeFunction.themes then
+            for ThemeIndex, ThemeIterator in pairs(ThemeFunction.themes) do
+                ThemeTable[ThemeIndex] = {
+                    Cor_Hub = Color3.fromRGB(ThemeIterator.colors.Cor_Hub[1], ThemeIterator.colors.Cor_Hub[2], ThemeIterator.colors.Cor_Hub[3]), 
+                    Cor_Options = Color3.fromRGB(ThemeIterator.colors.Cor_Options[1], ThemeIterator.colors.Cor_Options[2], ThemeIterator.colors.Cor_Options[3]), 
+                    Cor_Stroke = Color3.fromRGB(ThemeIterator.colors.Cor_Stroke[1], ThemeIterator.colors.Cor_Stroke[2], ThemeIterator.colors.Cor_Stroke[3]), 
+                    Cor_Text = Color3.fromRGB(ThemeIterator.colors.Cor_Text[1], ThemeIterator.colors.Cor_Text[2], ThemeIterator.colors.Cor_Text[3]), 
+                    Cor_DarkText = Color3.fromRGB(ThemeIterator.colors.Cor_DarkText[1], ThemeIterator.colors.Cor_DarkText[2], ThemeIterator.colors.Cor_DarkText[3]), 
+                    UseGradient = ThemeIterator.useGradient
+                };
+                if ThemeIterator.useGradient and ThemeIterator.gradientColors then
+                    if #ThemeIterator.gradientColors[1] == 2 then
+                        ThemeTable[ThemeIndex].GradientColors = {
+                            ColorSequence.new({
+                                ColorSequenceKeypoint.new(0, Color3.fromRGB(ThemeIterator.gradientColors[1][1][1], ThemeIterator.gradientColors[1][1][2], ThemeIterator.gradientColors[1][1][3])), 
+                                ColorSequenceKeypoint.new(1, Color3.fromRGB(ThemeIterator.gradientColors[1][2][1], ThemeIterator.gradientColors[1][2][2], ThemeIterator.gradientColors[1][2][3]))
+                            }), 
+                            ThemeIterator.gradientColors[2]
+                        };
+                    elseif #ThemeIterator.gradientColors[1] == 3 then
+                        ThemeTable[ThemeIndex].GradientColors = {
+                            ColorSequence.new({
+                                ColorSequenceKeypoint.new(0, Color3.fromRGB(ThemeIterator.gradientColors[1][1][1], ThemeIterator.gradientColors[1][1][2], ThemeIterator.gradientColors[1][1][3])), 
+                                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(ThemeIterator.gradientColors[1][2][1], ThemeIterator.gradientColors[1][2][2], ThemeIterator.gradientColors[1][2][3])), 
+                                ColorSequenceKeypoint.new(1, Color3.fromRGB(ThemeIterator.gradientColors[1][3][1], ThemeIterator.gradientColors[1][3][2], ThemeIterator.gradientColors[1][3][3]))
+                            }), 
+                            ThemeIterator.gradientColors[2]
+                        };
+                    elseif #ThemeIterator.gradientColors[1] == 4 then
+                        ThemeTable[ThemeIndex].GradientColors = {
+                            ColorSequence.new({
+                                ColorSequenceKeypoint.new(0, Color3.fromRGB(ThemeIterator.gradientColors[1][1][1], ThemeIterator.gradientColors[1][1][2], ThemeIterator.gradientColors[1][1][3])), 
+                                ColorSequenceKeypoint.new(0.3, Color3.fromRGB(ThemeIterator.gradientColors[1][2][1], ThemeIterator.gradientColors[1][2][2], ThemeIterator.gradientColors[1][2][3])), 
+                                ColorSequenceKeypoint.new(0.7, Color3.fromRGB(ThemeIterator.gradientColors[1][3][1], ThemeIterator.gradientColors[1][3][2], ThemeIterator.gradientColors[1][3][3])), 
+                                ColorSequenceKeypoint.new(1, Color3.fromRGB(ThemeIterator.gradientColors[1][4][1], ThemeIterator.gradientColors[1][4][2], ThemeIterator.gradientColors[1][4][3]))
+                            }), 
+                            ThemeIterator.gradientColors[2]
+                        };
+                    end;
+                end;
+                table.insert(ThemeInfo, {
+                    key = ThemeIndex, 
+                    name = ThemeIterator.name
+                });
+            end;
+        else
+            ThemeTable.OriginalTE = {
+                Cor_Hub = Color3.fromRGB(0, 0, 0), 
+                Cor_Options = Color3.fromRGB(255, 255, 255), 
+                Cor_Stroke = Color3.fromRGB(57, 57, 57), 
+                Cor_Text = Color3.fromRGB(255, 255, 255), 
+                Cor_DarkText = Color3.fromRGB(255, 255, 255), 
+                UseGradient = false
+            };
+            ThemeInfo = {
+                {
+                    key = "OriginalTE", 
+                    name = "Original Theme"
+                }
+            };
+        end;
+        local ThemeButton = CreateInstance("TextButton", ThemeName, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            Text = "", 
+            AutoButtonColor = false
+        });
+        CreateUICorner(ThemeButton);
+        CreateUIStroke(ThemeButton);
+        local ThemeLabel = CreateInstance("TextLabel", ThemeButton, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = ThemeTitle, 
+            Size = UDim2.new(1, 0, 0, 25), 
+            Position = UDim2.new(0, 35, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font
+        });
+        CreateScreenGui(ThemeLabel);
+        local ThemeFrame = CreateInstance("Frame", ThemeButton, {
+            Size = UDim2.new(1, 0, 0, 1), 
+            Position = UDim2.new(0, 0, 0, 25), 
+            BorderSizePixel = 0, 
+            BackgroundColor3 = ColorPalette.Cor_Stroke, 
+            Visible = false
+        });
+        local ThemeImage = CreateInstance("ImageLabel", ThemeButton, {
+            Image = "rbxassetid://6031090990", 
+            Size = UDim2.new(0, 25, 0, 25), 
+            Position = UDim2.new(0, 5, 0, 0), 
+            BackgroundTransparency = 1
+        });
+        local ThemeDescription = CreateInstance("TextLabel", ThemeButton, {
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            BackgroundTransparency = 9, 
+            Position = UDim2.new(1, -20, 0, 2.5), 
+            AnchorPoint = Vector2.new(1, 0), 
+            Size = UDim2.new(0, 100, 0, 20), 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            TextScaled = true, 
+            Font = ColorPalette.Text_Font, 
+            Text = "..."
+        });
+        CreateUICorner(ThemeDescription);
+        CreateUIStroke(ThemeDescription);
+        local ThemeScroll = CreateInstance("ScrollingFrame", ThemeButton, {
+            Size = UDim2.new(1, 0, 1, -25), 
+            Position = UDim2.new(0, 0, 0, 25), 
+            CanvasSize = UDim2.new(), 
+            ScrollingDirection = "Y", 
+            AutomaticCanvasSize = "Y", 
+            BackgroundTransparency = 1, 
+            ScrollBarThickness = 0
+        });
+        CreateInstance("UIPadding", ThemeScroll, {
+            PaddingLeft = UDim.new(0, 10), 
+            PaddingRight = UDim.new(0, 10), 
+            PaddingTop = UDim.new(0, 10), 
+            PaddingBottom = UDim.new(0, 10)
+        });
+        CreateInstance("UIListLayout", ThemeScroll, {
+            Padding = UDim.new(0, 5)
+        });
+        local ThemeParent = ThemeDefault;
+        local function CreateTheme(ThemeKey) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v367 (ref), l_v363_0 (ref), v0 (ref), v1 (ref), v36 (ref), v360 (ref), v48 (ref), v6 (ref), v365 (ref)
+            if ThemeTable[ThemeKey] then
+                ThemeParent = ThemeKey;
+                local ThemeValue = ThemeTable[ThemeKey];
+                ColorPalette.Cor_Hub = ThemeValue.Cor_Hub;
+                ColorPalette.Cor_Options = ThemeValue.Cor_Options;
+                ColorPalette.Cor_Stroke = ThemeValue.Cor_Stroke;
+                ColorPalette.Cor_Text = ThemeValue.Cor_Text;
+                ColorPalette.Cor_DarkText = ThemeValue.Cor_DarkText;
+                for Index, ThemeLoop in pairs(EmptyTable) do
+                    if ThemeLoop.button and ThemeLoop.stroke then
+                        CreateTween(ThemeLoop.button, "BackgroundColor3", ThemeValue.Cor_Hub, 0.5, false);
+                        CreateTween(ThemeLoop.stroke, "Color", ThemeValue.Cor_Stroke, 0.5, false);
+                    end;
+                end;
+                local ThemeContainer = ThemeName;
+                while ThemeContainer.Parent ~= ScreenGui and ThemeContainer.Parent ~= nil do
+                    ThemeContainer = ThemeContainer.Parent;
+                end;
+                do
+                    local ThemeElement = ThemeValue;
+                    if ThemeContainer.IsA(ThemeContainer, "Frame") then
+                        CreateTween(ThemeContainer, "BackgroundColor3", ThemeElement.Cor_Hub, 0.5, false);
+                        if ThemeElement.UseGradient then
+                            local ThemeGradient = ThemeContainer.FindFirstChildOfClass(ThemeContainer, "UIGradient");
+                            if not ThemeGradient then
+                                ThemeGradient = Instance.new("UIGradient");
+                                ThemeGradient.Parent = ThemeContainer;
+                            end;
+                            ThemeGradient.Color = ThemeElement.GradientColors[1];
+                            ThemeGradient.Rotation = ThemeElement.GradientColors[2];
+                        else
+                            local ThemeDecorator = ThemeContainer.FindFirstChildOfClass(ThemeContainer, "UIGradient");
+                            if ThemeDecorator then
+                                ThemeDecorator:Destroy();
+                            end;
+                        end;
+                        for Index, ThemeCounter in pairs(ScreenGui:GetDescendants()) do
+                            if ThemeCounter:IsA("UIStroke") then
+                                CreateTween(ThemeCounter, "Color", ThemeElement.Cor_Stroke, 0.5, false);
+                            end;
+                        end;
+                        do
+                            local function CreateDecorator(DecoratorParameter) --[[ Line: 0 ]] --[[ Name:  ]]
+                                -- upvalues: v36 (ref), l_v379_0 (ref), v388 (ref)
+                                for Index, DecoratorElement in pairs(DecoratorParameter:GetChildren()) do
+                                    if DecoratorElement:IsA("Frame") and DecoratorElement.BackgroundTransparency < 0.9 then
+                                        CreateTween(DecoratorElement, "BackgroundColor3", ThemeElement.Cor_Options, 0.5, false);
+                                        if ThemeElement.UseGradient and DecoratorElement.Size.Y.Offset > 50 then
+                                            local GradientStyle = DecoratorElement:FindFirstChildOfClass("UIGradient");
+                                            if not GradientStyle then
+                                                GradientStyle = Instance.new("UIGradient");
+                                                GradientStyle.Parent = DecoratorElement;
+                                            end;
+                                            GradientStyle.Color = ColorSequence.new({
+                                                ColorSequenceKeypoint.new(0, ThemeElement.Cor_Options), 
+                                                ColorSequenceKeypoint.new(1, ThemeElement.Cor_Stroke)
+                                            });
+                                            GradientStyle.Rotation = (ThemeElement.GradientColors[2] + 45) % 360;
+                                        elseif not ThemeElement.UseGradient then
+                                            local GradientDecorator = DecoratorElement:FindFirstChildOfClass("UIGradient");
+                                            if GradientDecorator then
+                                                GradientDecorator:Destroy();
+                                            end;
+                                        end;
+                                    end;
+                                    CreateDecorator(DecoratorElement);
+                                end;
+                            end;
+                            CreateDecorator(ThemeContainer);
+                        end;
+                    end;
+                    local FrameDecorator = Instance.new("Frame");
+                    FrameDecorator.Size = UDim2.new(0, 0, 0, 0);
+                    FrameDecorator.Position = UDim2.new(0.5, 0, 0.5, 0);
+                    FrameDecorator.AnchorPoint = Vector2.new(0.5, 0.5);
+                    FrameDecorator.BackgroundColor3 = ThemeElement.Cor_Stroke;
+                    FrameDecorator.BackgroundTransparency = 0.8;
+                    FrameDecorator.BorderSizePixel = 0;
+                    FrameDecorator.Parent = ThemeContainer;
+                    local CornerStyle2 = Instance.new("UICorner");
+                    CornerStyle2.CornerRadius = UDim.new(1, 0);
+                    CornerStyle2.Parent = FrameDecorator;
+                    CreateTween(FrameDecorator, "Size", UDim2.new(2, 0, 2, 0), 0.5, false);
+                    CreateTween(FrameDecorator, "BackgroundTransparency", 1, 0.5, false);
+                    task.delay(0.5, function() --[[ Line: 0 ]] --[[ Name:  ]]
+                        -- upvalues: l_Frame_2 (ref)
+                        FrameDecorator:Destroy();
+                    end);
+                    PlaySound();
+                    ThemeCallback(ThemeKey);
+                end;
+            end;
+        end;
+        local function CreateStyle(StyleParameter) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v16 (ref), v376 (ref), v0 (ref), v25 (ref), v363 (ref), v375 (ref), v396 (ref)
+            local StyleButton = CreateInstance("TextButton", ThemeScroll, {
+                Size = UDim2.new(1, 0, 0, 15), 
+                Text = StyleParameter.name, 
+                Font = ColorPalette.Text_Font, 
+                TextSize = 12, 
+                TextColor3 = Color3.fromRGB(180, 180, 180), 
+                BackgroundTransparency = 1, 
+                RichText = true
+            });
+            CreateUICorner(StyleButton);
+            local IsStyleFalse = false;
+            if StyleParameter.key == ThemeDefault then
+                IsStyleFalse = true;
+                StyleButton.BackgroundTransparency = 0.8;
+                StyleButton.TextColor3 = ColorPalette.Cor_Text;
+                ThemeDescription.Text = StyleParameter.name;
+                CreateTheme(StyleParameter.key);
+            end;
+            StyleButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: v376 (ref), v375 (ref), v397 (ref), v396 (ref), v398 (ref), v0 (ref)
+                for Index, StyleIndex in pairs(ThemeScroll:GetChildren()) do
+                    if StyleIndex:IsA("TextButton") then
+                        StyleIndex.BackgroundTransparency = 1;
+                        StyleIndex.TextColor3 = Color3.fromRGB(180, 180, 180);
+                    end;
+                end;
+                ThemeDescription.Text = StyleParameter.name;
+                CreateTheme(StyleParameter.key);
+                StyleButton.BackgroundTransparency = 0.8;
+                StyleButton.TextColor3 = ColorPalette.Cor_Text;
+            end);
+        end;
+        for Index, StyleIterator in pairs(ThemeInfo) do
+            CreateStyle(StyleIterator);
+        end;
+        local IsStyleFalse2 = false;
+        ThemeButton.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v376 (ref), v405 (ref), v36 (ref), v371 (ref), v374 (ref), v373 (ref)
+            local StyleCount = 25;
+            local StyleOffset = 0;
+            for Index, StyleCounter in pairs(ThemeScroll:GetChildren()) do
+                if StyleCounter:IsA("TextButton") and StyleOffset < 5 then
+                    StyleOffset = StyleOffset + 1;
+                    StyleCount = StyleCount + tonumber(StyleCounter.Size.Y.Offset + 10);
+                end;
+            end;
+            if not IsStyleFalse2 then
+                CreateTween(ThemeButton, "Size", UDim2.new(1, 0, 0, StyleCount), 0.3, false);
+                CreateTween(ThemeImage, "Rotation", 180, 0.3, false);
+                IsStyleFalse2 = true;
+                ThemeFrame.Visible = true;
+            else
+                CreateTween(ThemeButton, "Size", UDim2.new(1, 0, 0, 25), 0.3, false);
+                CreateTween(ThemeImage, "Rotation", 0, 0.3, true);
+                IsStyleFalse2 = false;
+                ThemeFrame.Visible = false;
+            end;
+        end);
+        return {
+            ThemeScroll, 
+            ThemeDefault, 
+            CreateTheme, 
+            ThemeDescription
+        };
+    end;
+    AddResetButton = function(ResetName, ResetData) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref), v36 (ref), v6 (ref), v48 (ref), v47 (ref)
+        local ResetTitle = ResetData.Name or "Reset Settings";
+        local ResetCallback = ResetData.Callback or function() --[[ Line: 0 ]] --[[ Name:  ]]
+
+        end;
+        local ResetButton = CreateInstance("TextButton", ResetName, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Options, 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            Text = "", 
+            AutoButtonColor = false, 
+            ClipsDescendants = true
+        });
+        CreateUICorner(ResetButton);
+        local StrokeStyle = Instance.new("UIStroke");
+        StrokeStyle.Color = ColorPalette.Cor_Stroke;
+        StrokeStyle.Thickness = 1.5;
+        StrokeStyle.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        StrokeStyle.Parent = ResetButton;
+        local ResetLabel = CreateInstance("TextLabel", ResetButton, {
+            TextSize = 13, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = ResetTitle, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            Position = UDim2.new(0, 13, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font, 
+            RichText = true
+        });
+        local ResetImage = CreateInstance("ImageLabel", ResetButton, {
+            Image = "rbxassetid://7072725342", 
+            Size = UDim2.new(0, 20, 0, 20), 
+            Position = UDim2.new(0, 305, 0, 2.5), 
+            BackgroundTransparency = 1, 
+            ImageColor3 = Color3.fromRGB(255, 255, 255)
+        });
+        local function CreateReset(Parameter1, Parameter2) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v0 (ref), v414 (ref), v36 (ref)
+            local MainFrame = Instance.new("Frame");
+            MainFrame.Name = "RippleEffect";
+            MainFrame.BackgroundColor3 = ColorPalette.Cor_Stroke;
+            MainFrame.BackgroundTransparency = 0.7;
+            MainFrame.BorderSizePixel = 0;
+            MainFrame.AnchorPoint = Vector2.new(0.5, 0.5);
+            MainFrame.Position = UDim2.new(0, Parameter1, 0, Parameter2);
+            MainFrame.Size = UDim2.new(0, 0, 0, 0);
+            MainFrame.ZIndex = 2;
+            local MainCorner = Instance.new("UICorner");
+            MainCorner.CornerRadius = UDim.new(1, 0);
+            MainCorner.Parent = MainFrame;
+            MainFrame.Parent = ResetButton;
+            local ScaledSize = UDim2.new(0, ResetButton.AbsoluteSize.X * 2.5, 0, ResetButton.AbsoluteSize.X * 2.5);
+            CreateTween(MainFrame, "Size", ScaledSize, 0.5, false);
+            CreateTween(MainFrame, "BackgroundTransparency", 1, 0.5, false);
+            spawn(function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: l_Frame_3 (ref)
+                wait(0.5);
+                MainFrame:Destroy();
+            end);
+        end;
+        ResetButton.MouseEnter:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_1 (ref), v0 (ref)
+            CreateTween(StrokeStyle, "Thickness", 2, 0.2, false);
+            CreateTween(StrokeStyle, "Color", Color3.fromRGB(math.min(255, ColorPalette.Cor_Stroke.R * 255 * 1.3), math.min(255, ColorPalette.Cor_Stroke.G * 255 * 1.3), math.min(255, ColorPalette.Cor_Stroke.B * 255 * 1.3)), 0.3, false);
+        end);
+        ResetButton.MouseLeave:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_1 (ref), v0 (ref)
+            CreateTween(StrokeStyle, "Thickness", 1.5, 0.2, false);
+            CreateTween(StrokeStyle, "Color", ColorPalette.Cor_Stroke, 0.3, false);
+        end);
+        ResetButton.MouseButton1Down:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_1 (ref)
+            CreateTween(StrokeStyle, "Thickness", 2.5, 0.1, false);
+        end);
+        ResetButton.MouseButton1Up:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v36 (ref), l_UIStroke_1 (ref)
+            CreateTween(StrokeStyle, "Thickness", 2, 0.1, false);
+        end);
+        ResetButton.MouseButton1Click:Connect(function(Index, Index) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v6 (ref), v414 (ref), v423 (ref), v0 (ref), v410 (ref), v48 (ref), v36 (ref), v417 (ref), v413 (ref)
+            PlaySound();
+            local MousePosition = game:GetService("UserInputService"):GetMouseLocation();
+            local AbsolutePosition = ResetButton.AbsolutePosition;
+            local OffsetX = MousePosition.X - AbsolutePosition.X;
+            local OffsetY = MousePosition.Y - AbsolutePosition.Y;
+            CreateReset(OffsetX, OffsetY);
+            ColorPalette.Cor_Hub = Color3.fromRGB(0, 0, 0);
+            ColorPalette.Cor_Options = Color3.fromRGB(0, 0, 0);
+            ColorPalette.Cor_Stroke = Color3.fromRGB(57, 57, 57);
+            ColorPalette.Cor_Text = Color3.fromRGB(255, 255, 255);
+            ColorPalette.Cor_DarkText = Color3.fromRGB(255, 255, 255);
+            local ParentFrame = ResetName;
+            while ParentFrame.Parent ~= ScreenGui and ParentFrame.Parent ~= nil do
+                ParentFrame = ParentFrame.Parent;
+            end;
+            if ParentFrame.IsA(ParentFrame, "Frame") then
+                local BackgroundImage = ParentFrame.FindFirstChild(ParentFrame, "BackgroundImage");
+                if BackgroundImage then
+                    BackgroundImage.Image = "rbxthumb://type=Asset&id=294720739644&w=420&h=420";
+                    BackgroundImage.ScaleType = Enum.ScaleType.Crop;
+                    BackgroundImage.Visible = true;
+                    BackgroundImage.BackgroundTransparency = 1;
+                    CreateTween(BackgroundImage, "ImageTransparency", 0.3, 0.5, false);
+                end;
+                local GradientEffect = ParentFrame.FindFirstChildOfClass(ParentFrame, "UIGradient");
+                if GradientEffect then
+                    GradientEffect:Destroy();
+                end;
+                CreateTween(ParentFrame, "BackgroundColor3", Color3.fromRGB(0, 0, 0), 0.5, false);
+                CreateTween(ParentFrame, "BackgroundTransparency", 0, 0.5, false);
+                for Index, LoopIndex in pairs(ScreenGui:GetDescendants()) do
+                    if LoopIndex:IsA("UIStroke") then
+                        CreateTween(LoopIndex, "Color", Color3.fromRGB(57, 57, 57), 0.5, false);
+                    end;
+                end;
+                local SubFrame = Instance.new("Frame");
+                SubFrame.Size = UDim2.new(0, 0, 0, 0);
+                SubFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
+                SubFrame.AnchorPoint = Vector2.new(0.5, 0.5);
+                SubFrame.BackgroundColor3 = Color3.fromRGB(57, 57, 57);
+                SubFrame.BackgroundTransparency = 0.8;
+                SubFrame.BorderSizePixel = 0;
+                SubFrame.Parent = ParentFrame;
+                local SubCorner = Instance.new("UICorner");
+                SubCorner.CornerRadius = UDim.new(1, 0);
+                SubCorner.Parent = SubFrame;
+                CreateTween(SubFrame, "Size", UDim2.new(2, 0, 2, 0), 0.5, false);
+                CreateTween(SubFrame, "BackgroundTransparency", 1, 0.5, false);
+                do
+                    local SubFrameReference = SubFrame;
+                    task.delay(0.5, function() --[[ Line: 0 ]] --[[ Name:  ]]
+                        -- upvalues: l_l_Frame_4_0 (ref)
+                        SubFrameReference:Destroy();
+                    end);
+                end;
+            end;
+            CreateTween(ResetImage, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2, true);
+            CreateTween(ResetImage, "ImageColor3", Color3.fromRGB(57, 57, 57), 0.2, true);
+            CreateTween(ResetImage, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2, false);
+            ResetCallback("Reset to Original Settings!");
+        end);
+        CreateScreenGui(ResetLabel);
+        return {
+            ResetButton, 
+            ResetLabel, 
+            StrokeStyle
+        };
+    end;
+    UpdateDropdown = function(ParameterArray, ParameterArray2) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref)
+        local FirstElement = ParameterArray[1];
+        local SecondElement = ParameterArray[2];
+        local ThirdElement = ParameterArray[3];
+        local FourthElement = ParameterArray[4];
+        for Index, LoopIndex2 in pairs(FirstElement:GetChildren()) do
+            if LoopIndex2:IsA("TextButton") then
+                LoopIndex2:Destroy();
+            end;
+        end;
+        local function LocalFunction(FunctionParameter) --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v16 (ref), v440 (ref), v0 (ref), v25 (ref), v441 (ref), v443 (ref), v442 (ref)
+            local TextButtonConfig = CreateInstance("TextButton", FirstElement, {
+                Size = UDim2.new(1, 0, 0, 15), 
+                Text = FunctionParameter, 
+                Font = ColorPalette.Text_Font, 
+                TextSize = 12, 
+                TextColor3 = Color3.fromRGB(180, 180, 180), 
+                BackgroundTransparency = 1; 
+                RickTex
+            });
+            CreateUICorner(TextButtonConfig);
+            local EmptyTable = {};
+            local BooleanValue = false;
+            if FunctionParameter == SecondElement then
+                BooleanValue = true;
+                TextButtonConfig.BackgroundTransparency = 0.9;
+                TextButtonConfig.TextColor3 = ColorPalette.Cor_Text;
+                FourthElement.Text = FunctionParameter;
+                ThirdElement(FunctionParameter);
+            else
+                FourthElement.Text = "...";
+            end;
+            TextButtonConfig.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+                -- upvalues: v440 (ref), v443 (ref), v446 (ref), v442 (ref), v447 (ref), v0 (ref)
+                for Index, LoopIndex3 in pairs(FirstElement:GetChildren()) do
+                    if LoopIndex3:IsA("TextButton") then
+                        LoopIndex3.BackgroundTransparency = 1;
+                        LoopIndex3.TextColor3 = Color3.fromRGB(180, 180, 180);
+                    end;
+                end;
+                FourthElement.Text = FunctionParameter;
+                ThirdElement(FunctionParameter);
+                TextButtonConfig.BackgroundTransparency = 0.8;
+                TextButtonConfig.TextColor3 = ColorPalette.Cor_Text;
+            end);
+        end;
+        for Index, LoopIndex4 in pairs(ParameterArray2) do
+            LocalFunction(LoopIndex4);
+        end;
+    end;
+    AddTextLabel = function(FrameParameter, FrameConfig) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v25 (ref), v29 (ref), v0 (ref), v47 (ref)
+        local FrameName = FrameConfig[1] or FrameConfig.Name or "Text Label!!";
+        local FrameInstance = CreateInstance("Frame", FrameParameter, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
+            BackgroundTransparency = 9, 
+            Name = "Frame"
+        });
+        CreateUICorner(FrameInstance);
+        CreateUIStroke(FrameInstance);
+        local TextButtonInstance = CreateInstance("TextButton", FrameInstance, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = FrameName, 
+            Size = UDim2.new(1, 0, 0, 25), 
+            Position = UDim2.new(0, 20, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = ColorPalette.Text_Font
+        });
+        CreateScreenGui(TextButtonInstance);
+        return TextButtonInstance;
+    end;
+    SetLabel = function(Parameter1, Parameter2) --[[ Line: 0 ]] --[[ Name:  ]]
+        Parameter1.Text = Parameter2;
+    end;
+    AddImageLabel = function(FrameParameter2, FrameConfig2) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref), v29 (ref), v47 (ref)
+        local FrameName2 = FrameConfig2[1] or FrameConfig2.Name or "";
+        local ImageLabelName = FrameConfig2[2] or FrameConfig2.Image or "Image Label";
+        local FrameInstance2 = CreateInstance("Frame", FrameParameter2, {
+            Size = UDim2.new(0, 95, 0, 110), 
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
+            BackgroundTransparency = 9, 
+            Name = "Frame"
+        });
+        local TextButtonInstance2 = CreateInstance("TextButton", FrameInstance2, {
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = FrameName2, 
+            Size = UDim2.new(0, 0, 0, 0), 
+            BackgroundTransparency = 1, 
+            Font = ColorPalette.Text_Font
+        });
+        local StrokeInstance = Instance.new("UIStroke", FrameInstance2);
+        StrokeInstance.Thickness = 2;
+        StrokeInstance.Color = Color3.fromRGB(57, 57, 57);
+        StrokeInstance.Transparency = 0.1;
+        StrokeInstance.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        local GradientInstance = Instance.new("UIGradient", StrokeInstance);
+        GradientInstance.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(57, 57, 57)), 
+            ColorSequenceKeypoint.new(0.25, Color3.fromRGB(120, 120, 120)), 
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)), 
+            ColorSequenceKeypoint.new(0.75, Color3.fromRGB(120, 120, 120)), 
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(57, 57, 57))
+        });
+        GradientInstance.Rotation = 0;
+        game:GetService("TweenService"):Create(GradientInstance, TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, false), {
+            Rotation = 360
+        }):Play();
+        local ImageLabelInstance = CreateInstance("ImageLabel", FrameInstance2, {
+            Image = ImageLabelName, 
+            Size = UDim2.new(0, 80, 0, 82), 
+            Position = UDim2.new(0, 9, 0, 25), 
+            BackgroundTransparency = 1
+        });
+        CreateUICorner(FrameInstance2);
+        CreateUIStroke(FrameInstance2);
+        CreateScreenGui(TextButtonInstance2);
+        return ImageLabelInstance;
+    end;
+    SetImage = function(Parameter3, Parameter4) --[[ Line: 0 ]] --[[ Name:  ]]
+        Parameter3.Image = Parameter4;
+    end;
+    AddParagraph = function(FrameParameter3, FrameConfig3) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v25 (ref), v29 (ref), v0 (ref), v47 (ref)
+        local ParagraphTitle = FrameConfig3[1] or FrameConfig3.Title or "Paragraph!!";
+        local ParagraphText = FrameConfig3[1] or FrameConfig3.Text or "Paragraph!!";
+        local FrameInstance3 = CreateInstance("Frame", FrameParameter3, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
+            BackgroundTransparency = 9, 
+            Name = "Frame", 
+            AutomaticSize = "Y"
+        });
+        CreateUICorner(FrameInstance3);
+        CreateUIStroke(FrameInstance3);
+        CreateInstance("UIListLayout", FrameInstance3);
+        CreateInstance("UIPadding", FrameInstance3, {
+            PaddingLeft = UDim.new(0, 20), 
+            PaddingRight = UDim.new(0, 10), 
+            PaddingTop = UDim.new(0, 5), 
+            PaddingBottom = UDim.new(0, 5)
+        });
+        local TextButtonInstance3 = CreateInstance("TextButton", FrameInstance3, {
+            Name = "Frame", 
+            TextSize = 12, 
+            TextColor3 = ColorPalette.Cor_Text, 
+            Text = ParagraphTitle, 
+            Size = UDim2.new(1, 0, 0, 0), 
+            AutomaticSize = "Y", 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            TextYAlignment = "Top", 
+            Font = ColorPalette.Text_Font, 
+            TextWrapped = true, 
+            RichText = true
+        });
+        CreateScreenGui(TextButtonInstance3);
+        return {
+            TextButtonInstance3, 
+            (CreateInstance("TextLabel", FrameInstance3, {
+                Name = "Frame", 
+                Size = UDim2.new(1, 0, 0, 0), 
+                BackgroundTransparency = 1, 
+                AutomaticSize = "Y", 
+                TextXAlignment = "Left", 
+                TextYAlignment = "Top", 
+                TextColor3 = ColorPalette.Cor_Text, 
+                TextSize = 11, 
+                Text = ParagraphText, 
+                Font = ColorPalette.Text_Font, 
+                TextWrapped = true, 
+                RichText = true
+            }))
+        };
+    end;
+    SetParagraph = function(Parameter5, Parameter6) --[[ Line: 0 ]] --[[ Name:  ]]
+        Parameter5[1].Text = Parameter6[1];
+        Parameter5[2].Text = Parameter6[2];
+    end;
+    AddSection = function(FrameParameter4, FrameConfig4) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref)
+        local SectionName = FrameConfig4[1] or FrameConfig4.Name or "Section!!";
+        local FrameInstance4 = CreateInstance("Frame", FrameParameter4, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            Name = "Frame", 
+            Transparency = 1
+        });
+        CreateUICorner(FrameInstance4);
+        return (CreateInstance("TextButton", FrameInstance4, {
+            TextSize = 13, 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            Text = SectionName, 
+            Size = UDim2.new(1, 0, 0, 25), 
+            Position = UDim2.new(0, 10, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = Enum.Font.SourceSans, 
+            RichText = true
+        }));
+    end;
+    SetSection = function(Parameter7, Parameter8) --[[ Line: 0 ]] --[[ Name:  ]]
+        Parameter7.Text = Parameter8;
+    end;
+    AddSection1 = function(FrameParameter5, FrameConfig5) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref)
+        local SectionName2 = FrameConfig5[1] or FrameConfig5.Name or "Section!!";
+        local FrameInstance5 = CreateInstance("Frame", FrameParameter5, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            Name = "Frame", 
+            Transparency = 1
+        });
+        CreateUICorner(FrameInstance5);
+        return (CreateInstance("TextButton", FrameInstance5, {
+            TextSize = 24, 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            Text = SectionName2, 
+            Size = UDim2.new(1, 0, 0, 25), 
+            Position = UDim2.new(0, 10, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = Enum.Font.SourceSans, 
+            RichText = true
+        }));
+    end;
+    SetSection = function(Parameter9, Parameter10) --[[ Line: 0 ]] --[[ Name:  ]]
+        Parameter9.Text = Parameter10;
+    end;
+    AddSection = function(FrameParameter6, FrameConfig6) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v0 (ref), v25 (ref)
+        local SectionName3 = FrameConfig6[1] or FrameConfig6.Name or "Section!!";
+        local FrameInstance6 = CreateInstance("Frame", FrameParameter6, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            BackgroundColor3 = ColorPalette.Cor_Hub, 
+            Name = "Frame", 
+            Transparency = 1
+        });
+        CreateUICorner(FrameInstance6);
+        return (CreateInstance("TextButton", FrameInstance6, {
+            TextSize = 17, 
+            TextColor3 = Color3.fromRGB(255, 255, 255), 
+            Text = SectionName3, 
+            Size = UDim2.new(1, 0, 0, 25), 
+            Position = UDim2.new(0, 10, 0, 0), 
+            BackgroundTransparency = 1, 
+            TextXAlignment = "Left", 
+            Font = Enum.Font.SourceSans, 
+            RichText = true
+        }));
+    end;
+    SetSection = function(Parameter11, Parameter12) --[[ Line: 0 ]] --[[ Name:  ]]
+        Parameter11.Text = Parameter12;
+    end;
+    AddDiscord = function(FrameParameter7, FrameConfig7) --[[ Line: 0 ]] --[[ Name:  ]]
+        -- upvalues: v16 (ref), v25 (ref)
+        local DiscordLink = FrameConfig7[1] or FrameConfig7.DiscordLink or "https://discord.gg/";
+        local DiscordIcon = FrameConfig7[2] or FrameConfig7.DiscordIcon or "rbxassetid://";
+        local DiscordTitle = FrameConfig7[3] or FrameConfig7.DiscordTitle or "";
+        local FrameInstance7 = CreateInstance("Frame", FrameParameter7, {
+            Size = UDim2.new(1, 0, 0, 110), 
+            BackgroundColor3 = Color3.fromRGB(30, 30, 30), 
+            Name = "Frame", 
+            AutomaticSize = "Y"
+        });
+        local TextLabelInstance = CreateInstance("TextLabel", FrameInstance7, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            Text = DiscordLink, 
+            TextXAlignment = "Left", 
+            BackgroundTransparency = 1, 
+            Position = UDim2.new(0, 12, 0, 0), 
+            TextColor3 = Color3.fromRGB(0, 120, 255), 
+            Font = Enum.Font.GothamBold, 
+            TextSize = 14
+        });
+        local TextLabelInstance2 = CreateInstance("TextLabel", FrameInstance7, {
+            Size = UDim2.new(1, 0, 0, 25), 
+            Text = DiscordTitle, 
+            TextXAlignment = "Left", 
+            BackgroundTransparency = 1, 
+            Position = UDim2.new(0, 60, 0, 25), 
+            TextColor3 = Color3.fromRGB(200, 200, 200), 
+            Font = Enum.Font.GothamBold, 
+            TextSize = 14
+        });
+        local ImageLabelInstance2 = CreateInstance("ImageLabel", FrameInstance7, {
+            Size = UDim2.new(0, 40, 0, 40), 
+            AnchorPoint = Vector2.new(0, 0.5), 
+            Position = UDim2.new(0, 12, 0.45, 0), 
+            Image = DiscordIcon
+        });
+        CreateUICorner(ImageLabelInstance2);
+        local TextButtonInstance4 = CreateInstance("TextButton", FrameInstance7, {
+            Size = UDim2.new(1, -24, 0, 25), 
+            AnchorPoint = Vector2.new(0.5, 1), 
+            Position = UDim2.new(0.5, 0, 1, -8), 
+            Text = "Join", 
+            Font = Enum.Font.GothamBold, 
+            TextSize = 15, 
+            TextColor3 = Color3.fromRGB(220, 220, 220), 
+            BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        });
+        CreateUICorner(ImageLabelInstance2);
+        local TickCount = tick();
+        ClickConter = 0;
+        TextButtonInstance4.MouseButton1Click:Connect(function() --[[ Line: 0 ]] --[[ Name:  ]]
+            -- upvalues: v509 (ref), v501 (ref), v508 (ref)
+            if ClickConter == 0 or tick() - TickCount > 5 then
+                TickCount = tick();
+                setclipboard(DiscordLink);
+                ClickConter = ClickConter + 1;
+                TextButtonInstance4.Text = "Copied to Clipboard";
+                TextButtonInstance4.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+                TextButtonInstance4.TextColor3 = Color3.fromRGB(150, 150, 150);
+                task.wait(5);
+                TextButtonInstance4.Text = "Join";
+                TextButtonInstance4.BackgroundColor3 = Color3.fromRGB(50, 200, 50);
+                TextButtonInstance4.TextColor3 = Color3.fromRGB(220, 220, 220);
+            end;
+        end);
+    end;
+    return BackgroundFrame;
+end;
